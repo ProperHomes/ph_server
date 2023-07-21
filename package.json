@@ -1,0 +1,54 @@
+{
+  "name": "ph_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node -r esm index.js",
+    "dev": "nodemon -r esm index.js",
+    "db:migrate:local": "rambler -c rambler.json -e local apply --all",
+    "db:rollback:local": "rambler -c rambler.json -e local reverse --all",
+    "db:seed:local": "NODE_ENV=local node -r esm -e 'require(\"./db/seed.js\").seed()'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "npm": ">=8.3.0",
+    "node": "^16.18.1 || >=16.18.1"
+  },
+  "author": "factsfinder",
+ 
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.374.0",
+    "@aws-sdk/lib-storage": "^3.374.0",
+    "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
+    "@graphile/pg-aggregates": "^0.1.1",
+    "@graphile/pg-pubsub": "^4.13.0",
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0",
+    "connect-pg-simple": "^9.0.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.9",
+    "dotenv": "^16.3.1",
+    "esm": "^3.2.25",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "graphile-utils": "^4.13.0",
+    "graphql-upload": "^10.0.0",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "passport": "^0.6.0",
+    "passport-google-oidc": "^0.1.0",
+    "passport-local": "^1.0.0",
+    "passport-magic-link": "^2.1.0",
+    "postgraphile": "^4.13.0",
+    "postgraphile-plugin-connection-filter": "^2.3.0",
+    "postgraphile-plugin-derived-field": "^1.0.0-alpha.7",
+    "postgraphile-plugin-upload-field": "^1.0.0-alpha.10",
+    "twilio": "^4.14.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "nodemon": "^3.0.1",
+    "pg": "^8.11.1"
+  }
+}

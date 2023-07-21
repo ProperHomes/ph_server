@@ -1,0 +1,21 @@
+{
+  "driver": "postgresql",
+  "protocol": "tcp",
+  "host": "localhost",
+  "port": 5432,
+  "user": "ph_dev",
+  "password": "password",
+  "directory": "./db/migrations",
+  "table": "migrations",
+  "environments": {
+    "production": {
+      "database": "NOPE"
+    },
+    "development": {
+      "database": "properhomes"
+    },
+    "local": {
+      "database": "properhomes"
+    }
+  }
+}

@@ -1,0 +1,207 @@
+-- rambler up
+
+create type ph_public.user_type as enum (
+    'SELLER',
+    'AGENT',
+    'BUYER'
+    'BOTH' -- A seller or a buyer account can be converted into BOTH seller & buyer account.
+);
+
+create type ph_public.org_level_type as enum (
+    'ADMIN',
+    'MANAGER'
+);
+
+create type ph_public.property_type as enum (
+    'HOUSE',
+    'VILLA',
+    'LOT',
+    'APARTMENT',
+    'BUNGALOW',
+    'FARM_HOUSE',
+    'PENT_HOUSE',
+    'COUNTRY_HOME',
+    'CHATEAU',
+    'CABIN'
+);
+
+create type ph_public.property_condition as enum (
+    'OK',
+    'GOOD',
+    'VERY_GOOD',
+    'AVERAGE',
+    'BAD'
+);
+
+create type ph_public.listing_type as enum (
+    'SALE',
+    'RENT',
+    'LEASE'
+);
+
+comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
+comment on type ph_public.property_condition is E'@enum\n@enumName PropertyConditionType';
+comment on type ph_public.property_type is E'@enum\n@enumName PropertyType';
+comment on type ph_public.user_type is E'@enum\n@enumName TypeOfUser';
+
+create table if not exists ph_public.file (
+    id uuid primary key default gen_random_uuid(),
+    key text not null,
+    info jsonb default '{}' :: jsonb,
+    extension text not null check(char_length(extension) < 20),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.user (
+    id uuid primary key default gen_random_uuid(),
+    name text not null,
+    phone_number text unique,
+    username text unique,
+    email citext unique check(email ~ '[^@]+@[^@]+\.[^@]+'),
+    password_hash text,
+    type ph_public.user_type not null,
+    org_user_type ph_public.org_level_type,
+    avatar_id uuid references ph_public.file(id),
+    cover_image_id uuid references ph_public.file(id),
+    attributes jsonb default '{}'::jsonb,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+comment on column ph_public.user.password_hash is E'@omit';
+
+alter table ph_public.file add column creator_id uuid not null  references ph_public.user(id);
+
+create table if not exists ph_public.federated_credential (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id) on delete cascade,
+    provider varchar(255) not null,
+    provider_id varchar(255) not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_private.session (
+    "sid" varchar NOT NULL COLLATE "default",
+    "sess" json NOT NULL,
+    "expire" timestamp(6) NOT NULL
+) WITH (OIDS=FALSE);
+alter table ph_private.session add constraint "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+
+
+create table if not exists ph_public.organization (
+    id uuid primary key default gen_random_uuid(),
+    name text not null,
+    logo_id uuid references ph_public.file(id),
+    attributes jsonb default '{}'::jsonb,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+alter table ph_public.user add column org_id uuid references ph_public.organization(id);
+
+create table if not exists ph_public.property (
+    id uuid primary key default gen_random_uuid(),
+    number serial unique,
+    type ph_public.property_type not null,
+    title text not null,
+    description text not null,
+    country text not null,
+    city text not null,
+    price text not null,
+    size text not null, -- In Sq.Feet ?
+    bedrooms int,
+    bathrooms int,
+    age int, -- in months
+    has_parking boolean,
+    has_basement boolean,
+    has_swimming_pool boolean,
+    is_furnished boolean, 
+    attributes jsonb default '{}'::jsonb,
+    owner_id uuid references ph_public.user(id),
+    agent_id uuid references ph_public.user(id),
+    org_id uuid references ph_public.organization(id),
+    listed_for ph_public.listing_type not null,
+    condition ph_public.property_condition not null default 'GOOD',
+    fts_doc_en tsvector not null generated always as (
+        to_tsvector(
+            'english',
+            title || ' ' || description
+        )
+    ) stored,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_media (
+    id uuid primary key default gen_random_uuid(),
+    property_id uuid not null references ph_public.property(id) on delete cascade,
+    media_id uuid not null references ph_public.file(id),
+    is_cover_image boolean not null default false,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.saved_property (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id) on delete cascade,
+    property_id uuid not null references ph_public.property(id) on delete cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.notification (
+    id uuid primary key default gen_random_uuid(),
+    action_text text, -- eg: commented on your post, raised a toast, followed you etc.;
+    by_user_id uuid references ph_public.user(id),
+    to_user_id uuid references ph_public.user(id),
+    property_id uuid references ph_public.property(id),
+    is_broadcast boolean default false,
+    broadcast_info jsonb default '{}',
+    read_at timestamptz, 
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.conversation (
+    id uuid primary key default gen_random_uuid(),
+    by_user_id uuid not null references ph_public.user(id),
+    to_user_id uuid not null references ph_public.user(id),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.message (
+    id uuid primary key default gen_random_uuid(),
+    conversation_id uuid not null references ph_public.conversation(id),
+    by_user_id uuid not null references ph_public.user(id),
+    to_user_id uuid references ph_public.user(id),
+    content text not null,
+    archived_at timestamptz,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+
+-- rambler down
+
+drop table if exists ph_public.message;
+drop table if exists ph_public.conversation;
+drop table if exists ph_public.notification;
+drop table if exists ph_public.saved_property;
+drop table if exists ph_public.property_media;
+drop table if exists ph_public.property;
+alter table ph_public.user drop column org_id;
+drop table if exists ph_public.organization;
+drop table if exists ph_private.session;
+drop table if exists ph_public.federated_credential;
+alter table ph_public.file drop column creator_id;
+drop table if exists ph_public.user;
+drop table if exists ph_public.file;
+
+drop type if exists ph_public.listing_type;
+drop type if exists ph_public.property_condition;
+drop type if exists ph_public.property_type;
+drop type if exists ph_public.org_level_type;
+drop type if exists ph_public.user_type;
