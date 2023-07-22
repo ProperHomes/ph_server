@@ -22,6 +22,7 @@ create index if not exists property_is_furnished_idx on ph_public.property(is_fu
 create index if not exists property_parking_idx on ph_public.property(has_parking);
 create index if not exists property_listed_for_idx on ph_public.property(listed_for);
 create index if not exists property_condition_idx on ph_public.property(condition);
+create index if not exists property_status_idx on ph_public.property(status);
 create index if not exists property_created_idx on ph_public.property(created_at);
 
 
@@ -83,6 +84,7 @@ drop index if exists property_media_media_idx;
 drop index if exists property_media_prop_idx;
 
 drop index if exists property_created_idx;
+drop index if exists property_status_idx;
 drop index if exists property_listed_for_idx;
 drop index if exists property_parking_idx;
 drop index if exists property_is_furnished_idx;

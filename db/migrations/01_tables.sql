@@ -41,6 +41,15 @@ create type ph_public.listing_type as enum (
     'LEASE'
 );
 
+create type ph_public.property_status as enum (
+    'IN_REVIEW',
+    'REJECTED',
+    'APPROVED',
+    'SOLD',
+    'NOT_FOR_SALE',
+    'NOT_FOR_RENT'
+);
+
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
 comment on type ph_public.property_condition is E'@enum\n@enumName PropertyConditionType';
 comment on type ph_public.property_type is E'@enum\n@enumName PropertyType';
@@ -127,6 +136,7 @@ create table if not exists ph_public.property (
     owner_id uuid references ph_public.user(id),
     agent_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
+    status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
     fts_doc_en tsvector not null generated always as (
