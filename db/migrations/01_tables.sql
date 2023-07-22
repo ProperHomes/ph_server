@@ -22,7 +22,9 @@ create type ph_public.property_type as enum (
     'PENT_HOUSE',
     'COUNTRY_HOME',
     'CHATEAU',
-    'CABIN'
+    'CABIN',
+    'PROJECT',
+    'COMMERCIAL'
 );
 
 create type ph_public.property_condition as enum (
@@ -62,6 +64,8 @@ create table if not exists ph_public.user (
     password_hash text,
     type ph_public.user_type not null,
     org_user_type ph_public.org_level_type,
+    country text not null,
+    city text not null,
     avatar_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
     attributes jsonb default '{}'::jsonb,
@@ -110,7 +114,8 @@ create table if not exists ph_public.property (
     country text not null,
     city text not null,
     price text not null,
-    size text not null, -- In Sq.Feet ?
+    area text not null, -- 2 Acres, 2000 sq.ft etc.;
+    sizes text not null, -- In Sq.Feet ranges ?
     bedrooms int,
     bathrooms int,
     age int, -- in months
@@ -137,7 +142,8 @@ create table if not exists ph_public.property (
 create table if not exists ph_public.property_media (
     id uuid primary key default gen_random_uuid(),
     property_id uuid not null references ph_public.property(id) on delete cascade,
-    media_id uuid not null references ph_public.file(id),
+    media_id uuid references ph_public.file(id),
+    media_url text,
     is_cover_image boolean not null default false,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()

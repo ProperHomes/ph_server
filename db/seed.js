@@ -5,45 +5,121 @@ const { faker } = require("@faker-js/faker");
 const { pgPool } = require("./index");
 const dbClient = pgPool;
 
-const imagesKeys = [
-  "test/image_1.jpeg",
-  "test/image_2.jpeg",
-  "test/image_3.jpeg",
+const propertyTypes = [
+  "HOUSE",
+  "VILLA",
+  "LOT",
+  "APARTMENT",
+  "BUNGALOW",
+  "FARM_HOUSE",
+  "PENT_HOUSE",
+  "COUNTRY_HOME",
+  "CHATEAU",
+  "CABIN",
+  "PROJECT",
+  "COMMERCIAL",
 ];
+
+const propertyConditions = ["OK", "GOOD", "VERY_GOOD", "AVERAGE"];
+const propertyListingType = ["SALE", "RENT", "LEASE"];
+
 const testUserPassword = "prince123#";
 
-const getRandomItem = (items) => {
-  return items[Math.floor(Math.random() * items.length)];
-};
-
-async function checkAndInsertImages() {
-  const fileIds = [];
-  const res = await dbClient.query("select id from ph.user where email=$1", [
-    "phanindrasrikar@gmail.com",
-  ]);
-  const fileCreatorId = res.rows[0].id;
-  if (fileCreatorId) {
-    for (key of imagesKeys) {
-      const fileRes = await dbClient.query(
-        "select * from ph_public.file where key = $1 and creator_id = $2",
-        [key, fileCreatorId]
-      );
-      if (fileRes?.rowCount === 1) {
-        fileIds.push(fileRes.rows[0].id);
-      } else {
-        const res = await dbClient.query(
-          "insert into ph_public.file(key, extension, creator_id) values($1, $2, $3) returning *",
-          [key, "image/jpeg", fileCreatorId]
-        );
-        const newFile = res.rows[0];
-        if (newFile) {
-          fileIds.push(newFile.id);
-        }
-      }
+async function insertPropertyMedia({ numberOfRecords, propertyId }) {
+  console.log("\n Generating fake property media now: ");
+  try {
+    const insertQuery = `insert into ph_public.property_media(
+      property_id, media_url
+    ) values ($1, $2)`;
+    for (let i = 0; i < numberOfRecords; i++) {
+      await dbClient.query(insertQuery, [
+        propertyId,
+        faker.image.urlLoremFlickr({ category: "building" }),
+      ]);
     }
+  } catch (err) {
+    console.log("error generating properties: ", err);
   }
+}
 
-  return fileIds;
+async function insertProperties({ numberOfRecords, ownerId }) {
+  console.log("\n Generating fake properties now: ");
+  try {
+    const insertQuery = `insert into ph_public.property(
+      title, type, description, country, city, 
+      price, area, sizes, bedrooms, bathrooms, 
+      age, has_parking, has_basement, has_swimming_pool,
+      is_furnished, owner_id, listed_for, condition 
+    ) values (
+      $1, $2, $3, $4, $5, $6, 
+      $7, $8, $9, $10, $11, $12, 
+      $13, $14, $15, $16, $17, $18
+    ) returning *`;
+
+    const propertyType = faker.helpers.arrayElement(propertyTypes);
+    const listingType = faker.helpers.arrayElement(propertyListingType);
+    const condition = faker.helpers.arrayElement(propertyConditions);
+    const city = faker.location.city();
+    const title = faker.helpers.fake(
+      `A ${condition} ${propertyType} for ${listingType} in the city of ${city} `
+    );
+    for (let i = 0; i < numberOfRecords; i++) {
+      const res = await dbClient.query(insertQuery, [
+        title,
+        propertyType,
+        faker.lorem.paragraphs(),
+        "India",
+        city,
+        `${faker.number.int({ max: 10000000 })}`,
+        `2 acres`,
+        `1500 to 5000 sq.ft`,
+        faker.number.int({ max: 6 }),
+        faker.number.int({ max: 3 }),
+        3,
+        true,
+        false,
+        false,
+        true,
+        ownerId,
+        listingType,
+        condition,
+      ]);
+      const newProperty = res.rows[0];
+      await insertPropertyMedia({
+        numberOfRecords,
+        propertyId: newProperty.id,
+      });
+    }
+  } catch (err) {
+    console.log("error generating properties: ", err);
+  }
+}
+
+async function insertSellers({ numberOfRecords }) {
+  console.log("\n Generating fake sellers now: ");
+  try {
+    const insertQuery = `insert into ph_public.user(
+        name, phone_number, password_hash, country, city, type
+      ) values ($1, $2, $3, $4, $5, $6) returning *`;
+    const hashedPassword = await bcrypt.hash(testUserPassword, 10);
+    const newUserIds = [];
+    for (let i = 0; i < numberOfRecords; i++) {
+      const res = await dbClient.query(insertQuery, [
+        faker.person.fullName(),
+        faker.phone.number("+91##########"),
+        hashedPassword,
+        "India",
+        faker.location.city(),
+        "SELLER",
+      ]);
+      const newUser = res.rows[0];
+      newUserIds.push(newUser.id);
+      await insertProperties({ numberOfRecords: 5 });
+    }
+    return newUserIds;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function seed() {
@@ -52,11 +128,9 @@ async function seed() {
       process.argv[1] === undefined ? 10 : Number(process.argv[1]);
 
     try {
-      await insertUsers({
-        numberOfRecords,
-      });
+      await insertSellers({ numberOfRecords });
     } catch (err) {
-      console.log("error generating users: ", err);
+      console.log("error generating sellers: ", err);
       return;
     }
     console.log("\n Finished seeding database \n Enjoy:");
