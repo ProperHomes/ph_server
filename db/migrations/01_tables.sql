@@ -127,6 +127,7 @@ create table if not exists ph_public.property (
     sizes text not null, -- In Sq.Feet ranges ?
     bedrooms int,
     bathrooms int,
+    slug text unique,
     age int, -- in months
     has_parking boolean,
     has_basement boolean,
@@ -216,6 +217,7 @@ alter table ph_public.file drop column creator_id;
 drop table if exists ph_public.user;
 drop table if exists ph_public.file;
 
+drop type if exists ph_public.property_status;
 drop type if exists ph_public.listing_type;
 drop type if exists ph_public.property_condition;
 drop type if exists ph_public.property_type;

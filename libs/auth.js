@@ -20,11 +20,11 @@ async function signup(req) {
   return newUser;
 }
 
-async function login(phoneNumber, password, cb) {
+async function login(phoneNumberOrEmail, password, cb) {
   try {
     const userRes = await pgPool.query(
-      `select * FROM ph_public.user WHERE phone_number = $1`,
-      [phoneNumber]
+      `select * FROM ph_public.user WHERE phone_number = $1 or email = $1`,
+      [phoneNumberOrEmail]
     );
     const user = userRes.rows[0];
     if (!user) {

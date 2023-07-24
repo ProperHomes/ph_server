@@ -49,21 +49,22 @@ async function insertProperties({ numberOfRecords, ownerId }) {
       title, type, description, country, city, 
       price, area, sizes, bedrooms, bathrooms, 
       age, has_parking, has_basement, has_swimming_pool,
-      is_furnished, owner_id, listed_for, condition 
+      is_furnished, owner_id, listed_for, condition, status, slug
     ) values (
       $1, $2, $3, $4, $5, $6, 
       $7, $8, $9, $10, $11, $12, 
-      $13, $14, $15, $16, $17, $18
+      $13, $14, $15, $16, $17, $18, $19, $20
     ) returning *`;
 
-    const propertyType = faker.helpers.arrayElement(propertyTypes);
-    const listingType = faker.helpers.arrayElement(propertyListingType);
-    const condition = faker.helpers.arrayElement(propertyConditions);
-    const city = faker.location.city();
-    const title = faker.helpers.fake(
-      `A ${condition} ${propertyType} for ${listingType} in the city of ${city} `
-    );
     for (let i = 0; i < numberOfRecords; i++) {
+      const propertyType = faker.helpers.arrayElement(propertyTypes);
+      const listingType = faker.helpers.arrayElement(propertyListingType);
+      const condition = faker.helpers.arrayElement(propertyConditions);
+      const city = faker.location.city();
+      const title = faker.helpers.fake(
+        `A ${condition} ${propertyType} for ${listingType} in the city of ${city} `
+      );
+      const slug = `${propertyType.toLowerCase()}-for-${listingType.toLowerCase()}-in-${city.toLowerCase()}`;
       const res = await dbClient.query(insertQuery, [
         title,
         propertyType,
@@ -83,6 +84,8 @@ async function insertProperties({ numberOfRecords, ownerId }) {
         ownerId,
         listingType,
         condition,
+        "APPROVED",
+        slug,
       ]);
       const newProperty = res.rows[0];
       await insertPropertyMedia({
