@@ -54,8 +54,13 @@ create policy delete_property_media ON ph_public.property_media for delete TO ph
 
 
 create policy select_saved_property ON ph_public.saved_property for select TO ph_user using (true);
-create policy insert_saved_property ON ph_public.saved_property for insert TO ph_user with check (id = current_setting('jwt_claims.user_id', true)::uuid);
-create policy delete_saved_property ON ph_public.saved_property for delete TO ph_user using (id = current_setting('jwt_claims.user_id', true)::uuid);
+create policy insert_saved_property ON ph_public.saved_property for insert TO ph_user with check (user_id = current_setting('jwt_claims.user_id', true)::uuid);
+create policy delete_saved_property ON ph_public.saved_property for delete TO ph_user using (user_id = current_setting('jwt_claims.user_id', true)::uuid);
+
+create policy select_property_review ON ph_public.property_review for select TO ph_anon using (true);
+create policy insert_property_review ON ph_public.property_review for insert TO ph_user with check (user_id = current_setting('jwt_claims.user_id', true)::uuid);
+create policy update_property_review ON ph_public.property_review for update TO ph_user using (user_id = current_setting('jwt_claims.user_id', true)::uuid);
+create policy delete_property_review ON ph_public.property_review for delete TO ph_user using (user_id = current_setting('jwt_claims.user_id', true)::uuid);
 
 create policy select_notification ON ph_public.notification for select TO ph_user using (true);
 create policy update_notification ON ph_public.notification for update TO ph_user using (true);
@@ -94,6 +99,11 @@ drop policy if exists select_conversation on ph_public.conversation;
 drop policy if exists insert_notification on ph_public.notification;
 drop policy if exists update_notification on ph_public.notification;
 drop policy if exists select_notification on ph_public.notification;
+
+drop policy if exists delete_property_review on ph_public.property_review;
+drop policy if exists update_property_review on ph_public.property_review;
+drop policy if exists insert_property_review on ph_public.property_review;
+drop policy if exists select_property_review on ph_public.property_review;
 
 drop policy if exists delete_saved_property on ph_public.saved_property;
 drop policy if exists insert_saved_property on ph_public.saved_property;

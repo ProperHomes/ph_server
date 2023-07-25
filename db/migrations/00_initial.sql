@@ -23,6 +23,7 @@ grant usage on schema ph_public to ph_anon, ph_user;
 
 grant ph_anon to ph_user;
 grant ph_user to ph_postgraphile;
+grant ph_postgraphile to ph_dev;
 
 -- rambler down
 

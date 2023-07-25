@@ -6,18 +6,28 @@ alter default privileges revoke execute on functions from public;
 
 grant select on table ph_public.file to ph_anon;
 grant insert, delete on table ph_public.file to ph_user;
+
 grant select, insert, update on table ph_public.user to ph_user;
+
 grant select, insert on table ph_public.federated_credential to ph_user;
 grant update(
   provider, provider_id, updated_at
 ) on table ph_public.federated_credential to ph_user;
+
 grant select, insert, delete on table ph_private.session to ph_postgraphile;
 grant update(expire, sid, sess) on table ph_private.session to ph_postgraphile;
+
 grant select on table ph_public.property to ph_anon;
 grant insert, update on table ph_public.property to ph_user;
+
 grant select on table ph_public.property_media to ph_anon;
 grant insert, update, delete on table ph_public.property_media to ph_user;
+
 grant select, insert, delete on table ph_public.saved_property to ph_user;
+
+grant select on table ph_public.property_review to ph_anon;
+grant insert, delete, update on table ph_public.property_review to ph_user;
+
 grant select, insert, update, delete on table ph_public.conversation to ph_user;
 grant select, insert, update, delete on table ph_public.message to ph_user;
 
@@ -47,6 +57,7 @@ revoke usage, select on all sequences in schema ph_public from ph_user;
 
 revoke ALL on ph_public.message from ph_user;
 revoke ALL on ph_public.conversation from ph_user;
+revoke ALL on ph_public.property_review from ph_user;
 revoke ALL on ph_public.saved_property from ph_user;
 revoke ALL on ph_public.property_media from ph_anon;
 revoke ALL on ph_public.property_media from ph_user;

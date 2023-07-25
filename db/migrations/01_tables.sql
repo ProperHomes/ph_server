@@ -160,6 +160,16 @@ create table if not exists ph_public.property_media (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists ph_public.property_review (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id) on delete cascade,
+    property_id uuid not null references ph_public.property(id) on delete cascade,
+    content text not null,
+    rating int, -- Note: should be between 1 to 5.
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 create table if not exists ph_public.saved_property (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references ph_public.user(id) on delete cascade,
@@ -207,6 +217,7 @@ drop table if exists ph_public.message;
 drop table if exists ph_public.conversation;
 drop table if exists ph_public.notification;
 drop table if exists ph_public.saved_property;
+drop table if exists ph_public.property_review;
 drop table if exists ph_public.property_media;
 drop table if exists ph_public.property;
 alter table ph_public.user drop column org_id;
