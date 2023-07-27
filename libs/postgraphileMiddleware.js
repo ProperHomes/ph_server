@@ -10,6 +10,7 @@ import PgAggregatesPlugin from "@graphile/pg-aggregates";
 
 import { resolveUpload, resolveSignedUrl } from "./aws.js";
 import { pgPool } from "../db/index";
+import { getWebsocketMiddlewares } from "../index";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -44,7 +45,7 @@ const setupPostgraphileMiddleware = (app) =>
     graphiql: !IS_PROD,
     enhanceGraphiql: true,
     subscriptions: true,
-    websocketMiddlewares: () => app.get("websocketMiddlewares"),
+    websocketMiddlewares: getWebsocketMiddlewares(),
     additionalGraphQLContextFromRequest: (req, res) => {
       return {
         user: {

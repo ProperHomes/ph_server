@@ -3,7 +3,7 @@
 create type ph_public.user_type as enum (
     'SELLER',
     'AGENT',
-    'BUYER'
+    'BUYER',
     'BOTH' -- A seller or a buyer account can be converted into BOTH seller & buyer account.
 );
 
@@ -17,10 +17,12 @@ create type ph_public.property_type as enum (
     'VILLA',
     'LOT',
     'APARTMENT',
+    'FLAT',
+    'PG',
     'BUNGALOW',
-    'FARM_HOUSE',
-    'PENT_HOUSE',
-    'COUNTRY_HOME',
+    'FARM HOUSE',
+    'PENT HOUSE',
+    'COUNTRY HOME',
     'CHATEAU',
     'CABIN',
     'PROJECT',
@@ -33,6 +35,13 @@ create type ph_public.property_condition as enum (
     'VERY_GOOD',
     'AVERAGE',
     'BAD'
+);
+
+create type ph_public.property_facing as enum (
+    'EAST',
+    'WEST',
+    'NORTH',
+    'SOUTH'
 );
 
 create type ph_public.listing_type as enum (
@@ -67,6 +76,7 @@ create table if not exists ph_public.file (
 create table if not exists ph_public.user (
     id uuid primary key default gen_random_uuid(),
     name text not null,
+    number text unique,
     phone_number text unique,
     username text unique,
     email citext unique check(email ~ '[^@]+@[^@]+\.[^@]+'),
@@ -122,6 +132,7 @@ create table if not exists ph_public.property (
     description text not null,
     country text not null,
     city text not null,
+    locality text,
     price text not null,
     area text not null, -- 2 Acres, 2000 sq.ft etc.;
     sizes text not null, -- In Sq.Feet ranges ?
@@ -133,6 +144,7 @@ create table if not exists ph_public.property (
     has_basement boolean,
     has_swimming_pool boolean,
     is_furnished boolean, 
+    facing ph_public.property_facing,
     attributes jsonb default '{}'::jsonb,
     owner_id uuid references ph_public.user(id),
     agent_id uuid references ph_public.user(id),
@@ -230,6 +242,7 @@ drop table if exists ph_public.file;
 
 drop type if exists ph_public.property_status;
 drop type if exists ph_public.listing_type;
+drop type if exists ph_public.property_facing;
 drop type if exists ph_public.property_condition;
 drop type if exists ph_public.property_type;
 drop type if exists ph_public.org_level_type;

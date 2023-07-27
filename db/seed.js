@@ -10,10 +10,12 @@ const propertyTypes = [
   "VILLA",
   "LOT",
   "APARTMENT",
+  "FLAT",
+  "PG",
   "BUNGALOW",
-  "FARM_HOUSE",
-  "PENT_HOUSE",
-  "COUNTRY_HOME",
+  "FARM HOUSE",
+  "PENT HOUSE",
+  "COUNTRY HOME",
   "CHATEAU",
   "CABIN",
   "PROJECT",
@@ -109,7 +111,7 @@ async function insertSellers({ numberOfRecords }) {
     for (let i = 0; i < numberOfRecords; i++) {
       const res = await dbClient.query(insertQuery, [
         faker.person.fullName(),
-        faker.phone.number("+91##########"),
+        faker.phone.number("91##########"),
         hashedPassword,
         "India",
         faker.location.city(),
@@ -125,6 +127,32 @@ async function insertSellers({ numberOfRecords }) {
   }
 }
 
+async function insertBuyers({ numberOfRecords }) {
+  console.log("\n Generating fake buyers now: ");
+  try {
+    const insertQuery = `insert into ph_public.user(
+        name, phone_number, password_hash, country, city, type
+      ) values ($1, $2, $3, $4, $5, $6) returning *`;
+    const hashedPassword = await bcrypt.hash(testUserPassword, 10);
+    const newUserIds = [];
+    for (let i = 0; i < numberOfRecords; i++) {
+      const res = await dbClient.query(insertQuery, [
+        faker.person.fullName(),
+        faker.phone.number("91##########"),
+        hashedPassword,
+        "India",
+        faker.location.city(),
+        "BUYER",
+      ]);
+      const newUser = res.rows[0];
+      newUserIds.push(newUser.id);
+    }
+    return newUserIds;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function seed() {
   if (process.env.NODE_ENV !== "production") {
     const numberOfRecords =
@@ -132,6 +160,12 @@ async function seed() {
 
     try {
       await insertSellers({ numberOfRecords });
+    } catch (err) {
+      console.log("error generating sellers: ", err);
+      return;
+    }
+    try {
+      await insertBuyers({ numberOfRecords });
     } catch (err) {
       console.log("error generating sellers: ", err);
       return;

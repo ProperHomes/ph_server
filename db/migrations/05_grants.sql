@@ -31,6 +31,8 @@ grant insert, delete, update on table ph_public.property_review to ph_user;
 grant select, insert, update, delete on table ph_public.conversation to ph_user;
 grant select, insert, update, delete on table ph_public.message to ph_user;
 
+grant select, insert, update on table ph_public.notification to ph_user;
+
 
 grant usage, select on ALL sequences in schema ph_public to ph_user; 
 
@@ -55,6 +57,7 @@ revoke execute on function ph_public.current_user from ph_user;
 
 revoke usage, select on all sequences in schema ph_public from ph_user;
 
+revoke ALL on ph_public.notification from ph_user;
 revoke ALL on ph_public.message from ph_user;
 revoke ALL on ph_public.conversation from ph_user;
 revoke ALL on ph_public.property_review from ph_user;

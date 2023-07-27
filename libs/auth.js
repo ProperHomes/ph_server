@@ -174,7 +174,7 @@ async function verifyProvider({ issuer, profile, cb }) {
         `insert into ph_public.federated_credential(provider, provider_id, user_id) values($1, $2, $3)`,
         [issuer, providerId, user.id]
       );
-    } else  {
+    } else {
       await dbClient.query("BEGIN");
       const newUserRes = await dbClient.query(
         `insert into ph_public.user(name, email, email_verified) values($1, $2, $3) returning *`,

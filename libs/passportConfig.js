@@ -17,7 +17,7 @@ module.exports = function (passport) {
 
   passport.use(
     "local-login-phone",
-    new LocalStrategy({ usernameField: "phone_number" }, login)
+    new LocalStrategy({ usernameField: "phoneNumber" }, login)
   );
 
   passport.use(

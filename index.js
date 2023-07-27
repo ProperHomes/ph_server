@@ -77,7 +77,11 @@ app.set("websocketMiddlewares", [
   passportSessionMiddleware,
 ]);
 
-const postgraphileMiddleware = setupPostgraphileMiddleware(app);
+export function getWebsocketMiddlewares() {
+  return app.get("websocketMiddlewares");
+}
+
+const postgraphileMiddleware = setupPostgraphileMiddleware();
 app.set("postgraphileMiddleware", postgraphileMiddleware);
 app.use(postgraphileMiddleware);
 
