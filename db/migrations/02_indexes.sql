@@ -34,6 +34,9 @@ create index if not exists property_media_media_idx on ph_public.property_media(
 create index if not exists property_review_property_idx on ph_public.property_review(property_id);
 create index if not exists property_review_user_idx on ph_public.property_review(user_id);
 
+create index if not exists property_report_property_idx on ph_public.property_report(property_id);
+create index if not exists property_report_user_idx on ph_public.property_report(user_id);
+
 create index if not exists property_saved_user_idx on ph_public.saved_property(user_id);
 create index if not exists property_saved_prop_idx on ph_public.saved_property(property_id);
 
@@ -84,6 +87,9 @@ drop index if exists notification_by_user_idx;
 
 drop index if exists property_saved_prop_idx;
 drop index if exists property_saved_user_idx;
+
+drop index if exists property_report_user_idx;;
+drop index if exists property_report_property_idx;
 
 drop index if exists property_review_user_idx;;
 drop index if exists property_review_property_idx;

@@ -20,9 +20,9 @@ create type ph_public.property_type as enum (
     'FLAT',
     'PG',
     'BUNGALOW',
-    'FARM HOUSE',
-    'PENT HOUSE',
-    'COUNTRY HOME',
+    'FARM_HOUSE',
+    'PENT_HOUSE',
+    'COUNTRY_HOME',
     'CHATEAU',
     'CABIN',
     'PROJECT',
@@ -152,10 +152,11 @@ create table if not exists ph_public.property (
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
+    -- Todo: set weights for city and locality
     fts_doc_en tsvector not null generated always as (
         to_tsvector(
             'english',
-            title || ' ' || description
+            title || ' ' || city || ' ' || coalesce(locality,  '')
         )
     ) stored,
     created_at timestamptz not null default now(),
@@ -186,6 +187,15 @@ create table if not exists ph_public.saved_property (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references ph_public.user(id) on delete cascade,
     property_id uuid not null references ph_public.property(id) on delete cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_report (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id) on delete cascade,
+    property_id uuid not null references ph_public.property(id) on delete cascade,
+    report text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -228,6 +238,7 @@ create table if not exists ph_public.message (
 drop table if exists ph_public.message;
 drop table if exists ph_public.conversation;
 drop table if exists ph_public.notification;
+drop table if exists ph_public.property_report;
 drop table if exists ph_public.saved_property;
 drop table if exists ph_public.property_review;
 drop table if exists ph_public.property_media;

@@ -28,6 +28,8 @@ grant select, insert, delete on table ph_public.saved_property to ph_user;
 grant select on table ph_public.property_review to ph_anon;
 grant insert, delete, update on table ph_public.property_review to ph_user;
 
+grant select, insert, delete, update on table ph_public.property_report to ph_user;
+
 grant select, insert, update, delete on table ph_public.conversation to ph_user;
 grant select, insert, update, delete on table ph_public.message to ph_user;
 
@@ -40,7 +42,7 @@ grant usage, select on ALL sequences in schema ph_public to ph_user;
 grant execute on function ph_public.current_user() to ph_user;
 grant execute on function ph_public.graphql_subscription() to ph_user;
 grant execute on function ph_public.broadcast(text, text) to ph_user;
-grant execute on function ph_public.search_properties(text) to ph_anon;
+grant execute on function ph_public.search_properties(text, text, text) to ph_anon;
 
 
 grant execute on function levenshtein(text, text) to ph_anon;
@@ -60,6 +62,7 @@ revoke usage, select on all sequences in schema ph_public from ph_user;
 revoke ALL on ph_public.notification from ph_user;
 revoke ALL on ph_public.message from ph_user;
 revoke ALL on ph_public.conversation from ph_user;
+revoke ALL on ph_public.property_report from ph_user;
 revoke ALL on ph_public.property_review from ph_user;
 revoke ALL on ph_public.saved_property from ph_user;
 revoke ALL on ph_public.property_media from ph_anon;
