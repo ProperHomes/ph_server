@@ -16,20 +16,17 @@ create extension if not exists "pg_trgm";
 
 create role ph_anon; -- anynoymous user role who is not authenticated or logged in.
 create role ph_user; -- user role who is logged in to our app
-create role ph_postgraphile login password 'password'; -- Todo: change password while migrating
 
-grant usage on schema ph_public to ph_anon, ph_user;
-
+grant usage on schema ph_public to ph_anon, ph_user, ph_dev;
+grant usage on schema ph_private to ph_dev;
 
 grant ph_anon to ph_user;
-grant ph_user to ph_postgraphile;
-grant ph_postgraphile to ph_dev;
+grant ph_user to ph_dev;
 
 -- rambler down
 
-revoke usage on schema ph_public from ph_anon, ph_user, ph_postgraphile;
+revoke usage on schema ph_public from ph_anon, ph_user;
 
-drop role if exists ph_postgraphile;
 drop role if exists ph_user;
 drop role if exists ph_anon;
 

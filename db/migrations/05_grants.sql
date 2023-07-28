@@ -14,8 +14,8 @@ grant update(
   provider, provider_id, updated_at
 ) on table ph_public.federated_credential to ph_user;
 
-grant select, insert, delete on table ph_private.session to ph_postgraphile;
-grant update(expire, sid, sess) on table ph_private.session to ph_postgraphile;
+grant select, insert, delete on table ph_private.session to ph_dev;
+grant update(expire, sid, sess) on table ph_private.session to ph_dev;
 
 grant select on table ph_public.property to ph_anon;
 grant insert, update on table ph_public.property to ph_user;
@@ -69,7 +69,7 @@ revoke ALL on ph_public.property_media from ph_anon;
 revoke ALL on ph_public.property_media from ph_user;
 revoke ALL on ph_public.property from ph_user;
 revoke ALL on ph_public.property from ph_anon;
-revoke ALL on ph_private.session from ph_postgraphile;
+revoke ALL on ph_private.session from ph_dev;
 revoke ALL on ph_public.federated_credential from ph_user;
 revoke ALL on ph_public.user from ph_user;
 revoke ALL on ph_public.file from ph_user;
