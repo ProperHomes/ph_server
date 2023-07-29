@@ -68,11 +68,11 @@ end;
 $$ language plpgsql VOLATILE STRICT;
 
 -- for ranking while searching  https://xata.io/blog/postgres-full-text-search-engine
-create function ph_public.search_properties(search_text text, propertyCity text, cityLocality text) 
+create function ph_public.search_properties(search_text text, city text, locality text) 
 returns setof ph_public.property as $$
-  select * from ph_public.property where 
-  (city = propertyCity and locality = cityLocality) or 
-  (similarity(title, search_text) > 0.3 or fts_doc_en @@ to_tsquery('english', search_text))
+  select * from ph_public.property p where 
+  (p.city = city and p.locality = locality) or 
+  (similarity(p.title, search_text) > 0.3 or p.fts_doc_en @@ to_tsquery('simple', search_text))
 $$ language sql stable;
 
 -- rambler down

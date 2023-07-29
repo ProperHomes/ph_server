@@ -76,7 +76,7 @@ create table if not exists ph_public.file (
 create table if not exists ph_public.user (
     id uuid primary key default gen_random_uuid(),
     name text not null,
-    number text unique,
+    number serial unique,
     phone_number text unique,
     username text unique,
     email citext unique check(email ~ '[^@]+@[^@]+\.[^@]+'),
@@ -153,9 +153,10 @@ create table if not exists ph_public.property (
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
     -- Todo: set weights for city and locality
+    -- TODO: Include type and listed_for on ts_vector below 
     fts_doc_en tsvector not null generated always as (
         to_tsvector(
-            'english',
+            'simple',
             title || ' ' || city || ' ' || coalesce(locality,  '')
         )
     ) stored,
