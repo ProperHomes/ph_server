@@ -99,9 +99,8 @@ const setupPostgraphileMiddleware = (app) =>
       ],
     },
     pgSettings: (req) => {
-      // Todo: Check for req.sessionID instead and fetch entity id from the session and use that to auth here.
       const entity = req.user;
-      if (entity) {
+      if (req.isAuthenticated() && entity) {
         return {
           role: "ph_user",
           "jwt.claims.user_id": `${entity.id}`,

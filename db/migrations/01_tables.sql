@@ -59,9 +59,29 @@ create type ph_public.property_status as enum (
     'NOT_FOR_RENT'
 );
 
+create type ph_public.property_city as enum (
+    'AMALAPURAM',
+    'BANGALORE',
+    'BHIMAVARAM',
+    'PALAKOLLU',
+    'CHENNAI',
+    'DELHI',
+    'GURGAON',
+    'HYDERABAD',
+    'KAKINADA',
+    'MUMBAI',
+    'PUNE',
+    'RAJAHMUNDRY',
+    'VIJAYAWADA',
+    'VISHAKAPATNAM'
+);
+
+comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
+comment on type ph_public.property_status is E'@enum\n@enumName PropertyStatus';
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
 comment on type ph_public.property_condition is E'@enum\n@enumName PropertyConditionType';
 comment on type ph_public.property_type is E'@enum\n@enumName PropertyType';
+comment on type ph_public.property_facing is E'@enum\n@enumName PropertyFacing';
 comment on type ph_public.user_type is E'@enum\n@enumName TypeOfUser';
 
 create table if not exists ph_public.file (
@@ -131,7 +151,7 @@ create table if not exists ph_public.property (
     title text not null,
     description text not null,
     country text not null,
-    city text not null,
+    city ph_public.property_city not null,
     locality text,
     price text not null,
     area text not null, -- 2 Acres, 2000 sq.ft etc.;
@@ -155,10 +175,7 @@ create table if not exists ph_public.property (
     -- Todo: set weights for city and locality
     -- TODO: Include type and listed_for on ts_vector below 
     fts_doc_en tsvector not null generated always as (
-        to_tsvector(
-            'simple',
-            title || ' ' || city || ' ' || coalesce(locality,  '')
-        )
+        to_tsvector('simple', slug)
     ) stored,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
@@ -166,7 +183,7 @@ create table if not exists ph_public.property (
 
 create table if not exists ph_public.property_media (
     id uuid primary key default gen_random_uuid(),
-    property_id uuid not null references ph_public.property(id) on delete cascade,
+    property_id uuid not null references ph_public.property(id),
     media_id uuid references ph_public.file(id),
     media_url text,
     is_cover_image boolean not null default false,
@@ -176,10 +193,18 @@ create table if not exists ph_public.property_media (
 
 create table if not exists ph_public.property_review (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid not null references ph_public.user(id) on delete cascade,
+    user_id uuid not null references ph_public.user(id),
     property_id uuid not null references ph_public.property(id) on delete cascade,
     content text not null,
     rating int, -- Note: should be between 1 to 5.
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_reach (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -194,7 +219,7 @@ create table if not exists ph_public.saved_property (
 
 create table if not exists ph_public.property_report (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid not null references ph_public.user(id) on delete cascade,
+    user_id uuid not null references ph_public.user(id),
     property_id uuid not null references ph_public.property(id) on delete cascade,
     report text,
     created_at timestamptz not null default now(),

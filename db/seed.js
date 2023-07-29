@@ -23,12 +23,20 @@ const propertyTypes = [
 ];
 
 export const ALL_CITIES = [
-  "HYDERABAD",
-  "VISHAKAPATNAM",
-  "VIJAYAWADA",
   "AMALAPURAM",
   "BANGALORE",
+  "BHIMAVARAM",
+  "PALAKOLLU",
+  "CHENNAI",
+  "DELHI",
+  "GURGAON",
+  "HYDERABAD",
+  "KAKINADA",
+  "MUMBAI",
   "PUNE",
+  "RAJAHMUNDRY",
+  "VIJAYAWADA",
+  "VISHAKAPATNAM",
 ];
 
 const propertyConditions = ["OK", "GOOD", "VERY_GOOD", "AVERAGE"];
