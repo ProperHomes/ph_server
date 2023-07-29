@@ -22,6 +22,15 @@ const propertyTypes = [
   "COMMERCIAL",
 ];
 
+export const ALL_CITIES = [
+  "HYDERABAD",
+  "VISHAKAPATNAM",
+  "VIJAYAWADA",
+  "AMALAPURAM",
+  "BANGALORE",
+  "PUNE",
+];
+
 const propertyConditions = ["OK", "GOOD", "VERY_GOOD", "AVERAGE"];
 const propertyListingType = ["SALE", "RENT", "LEASE"];
 
@@ -62,11 +71,11 @@ async function insertProperties({ numberOfRecords, ownerId }) {
       const propertyType = faker.helpers.arrayElement(propertyTypes);
       const listingType = faker.helpers.arrayElement(propertyListingType);
       const condition = faker.helpers.arrayElement(propertyConditions);
-      const city = faker.location.city();
+      const city = faker.helpers.arrayElement(ALL_CITIES);
       const title = faker.helpers.fake(
-        `A ${condition} ${propertyType} for ${listingType} in the city of ${city} `
+        `A ${propertyType} for ${listingType} in the city of ${city}`
       );
-      const slug = `${propertyType.toLowerCase()}-for-${listingType.toLowerCase()}-in-${city.toLowerCase()}`;
+      const slug = `${propertyType.toLowerCase()}-for-${listingType.toLowerCase()}-in-${city.toLowerCase()}-${i}`;
       const res = await dbClient.query(insertQuery, [
         title,
         propertyType,
