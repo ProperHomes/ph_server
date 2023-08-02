@@ -173,8 +173,6 @@ create table if not exists ph_public.property (
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
-    -- Todo: set weights for city and locality
-    -- TODO: Include type and listed_for on ts_vector below 
     fts_doc_en tsvector not null generated always as (
         to_tsvector('simple', slug)
     ) stored,
