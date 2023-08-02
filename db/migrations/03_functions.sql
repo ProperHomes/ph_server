@@ -71,8 +71,7 @@ $$ language plpgsql VOLATILE STRICT;
 create function ph_public.search_properties(search_text text, city text, locality text) 
 returns setof ph_public.property as $$
   select * from ph_public.property p where 
-  (p.city = city and p.locality = locality) or 
-  (similarity(p.title, search_text) > 0.3 or p.fts_doc_en @@ to_tsquery('simple', search_text))
+  p.fts_doc_en @@ to_tsquery('simple', search_text) or (similarity(p.title, search_text) > 0.3 or similarity(p.city::text, search_text) > 0.2)
 $$ language sql stable;
 
 -- rambler down

@@ -15,7 +15,7 @@ create type ph_public.org_level_type as enum (
 create type ph_public.property_type as enum (
     'HOUSE',
     'VILLA',
-    'LOT',
+    'LAND',
     'APARTMENT',
     'FLAT',
     'PG',
@@ -51,6 +51,7 @@ create type ph_public.listing_type as enum (
 );
 
 create type ph_public.property_status as enum (
+    'DRAFT',
     'IN_REVIEW',
     'REJECTED',
     'APPROVED',

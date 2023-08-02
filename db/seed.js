@@ -6,20 +6,20 @@ const { pgPool } = require("./index");
 const dbClient = pgPool;
 
 const propertyTypes = [
-  "HOUSE",
-  "VILLA",
-  "LOT",
-  "APARTMENT",
-  "FLAT",
-  "PG",
-  "BUNGALOW",
-  "FARM_HOUSE",
-  "PENT_HOUSE",
-  "COUNTRY_HOME",
-  "CHATEAU",
-  "CABIN",
-  "PROJECT",
-  "COMMERCIAL",
+  'HOUSE',
+  'VILLA',
+  'LAND',
+  'APARTMENT',
+  'FLAT',
+  'PG',
+  'BUNGALOW',
+  'FARM_HOUSE',
+  'PENT_HOUSE',
+  'COUNTRY_HOME',
+  'CHATEAU',
+  'CABIN',
+  'PROJECT',
+  'COMMERCIAL'
 ];
 
 export const ALL_CITIES = [
