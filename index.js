@@ -19,9 +19,8 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 const whitelistedOrigins = [
   // "http://localhost:3000",
-  "https://sandbox.properhomes.in",
-  "https://www.properhomes.in",
-  /https:\/\/properhomes-([\da-zA-Z\.-]+)-veera.vercel.app/,
+  // "https://sandbox.properhomes.in",
+  "https://properhomes.in",
 ];
 
 const app = express();
