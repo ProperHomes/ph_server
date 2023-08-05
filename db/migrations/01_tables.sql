@@ -108,6 +108,7 @@ create table if not exists ph_public.user (
     city text not null,
     avatar_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
+    viewed_free boolean default false,
     attributes jsonb default '{}'::jsonb,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()

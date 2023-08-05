@@ -9,7 +9,11 @@ import ConnectPgSimple from "connect-pg-simple";
 import { pgPool } from "./db/index";
 import setupPostgraphileMiddleware from "./libs/postgraphileMiddleware";
 import authRoutes from "./routes/auth";
-import { changePassword, forgotPasswordChange } from "./libs/auth";
+import {
+  changePassword,
+  forgotPasswordChange,
+  revalidateNextJSApp,
+} from "./libs/auth";
 
 const morgan = require("morgan");
 
@@ -116,6 +120,11 @@ app.post("/change/password", authCheck, (req, res) => {
 app.post("/change/forgot/password", authCheck, (req, res) => {
   if (req.user.id === req.body.userId) {
     forgotPasswordChange(req, res);
+  }
+});
+app.post("/revalidate", authCheck, (req, res) => {
+  if (req.user.id === req.body.userId) {
+    revalidateNextJSApp(req, res);
   }
 });
 

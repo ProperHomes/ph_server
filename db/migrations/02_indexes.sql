@@ -4,6 +4,7 @@ create index if not exists user_avatar_idx on ph_public.user(avatar_id);
 create index if not exists user_cover_image_idx on ph_public.user(cover_image_id);
 create index if not exists user_type_idx on ph_public.user(type);
 create index if not exists user_org_idx on ph_public.user(org_id);
+create index if not exists user_viewed_free_idx on ph_public.user(viewed_free);
 
 create index if not exists org_logo_idx on ph_public.organization(logo_id);
 
@@ -39,6 +40,7 @@ create index if not exists property_report_user_idx on ph_public.property_report
 
 create index if not exists property_saved_user_idx on ph_public.saved_property(user_id);
 create index if not exists property_saved_prop_idx on ph_public.saved_property(property_id);
+alter table ph_public.saved_property add constraint saved_property_constraint unique(user_id, property_id); 
 
 create index if not exists notification_by_user_idx on ph_public.notification(by_user_id);
 create index if not exists notification_to_user_idx on ph_public.notification(to_user_id);
@@ -85,6 +87,7 @@ drop index if exists notification_property_idx;
 drop index if exists notification_to_user_idx;
 drop index if exists notification_by_user_idx;
 
+alter table ph_public.saved_property drop constraint saved_property_constraint; 
 drop index if exists property_saved_prop_idx;
 drop index if exists property_saved_user_idx;
 
@@ -116,6 +119,7 @@ drop index if exists file_creator_id;
 
 drop index if exists org_logo_idx;
 
+drop index if exists user_viewed_free_idx;
 drop index if exists user_org_idx;
 drop index if exists user_type;
 drop index if exists user_cover_image_idx;

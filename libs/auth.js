@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { pgPool } from "../db/index";
 import { checkSmsVerificationToken, twilioClient } from "./twilio";
 
+const axios = require("axios/dist/node/axios.cjs"); // node
+
 async function signup(req) {
   const { phoneNumber, password, name, type } = req.body;
   let newUser;
@@ -283,6 +285,26 @@ async function sendPhoneNumberSmsOTP(req, res) {
   }
 }
 
+async function revalidateNextJSApp(req, res) {
+  if (!req.body.path) {
+    return res.status(500).json({ error: "revalidation path is required" });
+  }
+  try {
+    await axios.post(
+      `${process.env.FRONTEND_URL}/api/revalidate?secret=${process.env.FRONTEND_REVALIDATE_SECRET}`,
+      {
+        path: req.body.path,
+      },
+      {
+        headers: { "content-type": "application/json" },
+      }
+    );
+    return res.status(200).json({ status: "success" });
+  } catch (err) {
+    return res.status(500).json({ error: "revalidation failed" });
+  }
+}
+
 export {
   login,
   signup,
@@ -294,4 +316,5 @@ export {
   verifyPhoneNumberOtp,
   sendPhoneNumberSmsOTP,
   verifyPhoneNumberOtpAndLogin,
+  revalidateNextJSApp,
 };
