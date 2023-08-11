@@ -27,6 +27,7 @@ create type ph_public.property_type as enum (
     'CABIN',
     'PROJECT',
     'COMMERCIAL'
+    'HOSTEL',
 );
 
 create type ph_public.property_condition as enum (
@@ -56,6 +57,8 @@ create type ph_public.property_status as enum (
     'REJECTED',
     'APPROVED',
     'SOLD',
+    'RENT',
+    'LEASE',
     'NOT_FOR_SALE',
     'NOT_FOR_RENT'
 );
@@ -170,6 +173,8 @@ create table if not exists ph_public.property (
     attributes jsonb default '{}'::jsonb,
     owner_id uuid references ph_public.user(id),
     agent_id uuid references ph_public.user(id),
+    tenant_id uuid references ph_public.user(id),
+    guest_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,

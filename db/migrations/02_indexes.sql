@@ -15,6 +15,8 @@ create index if not exists user_federated_cred_idx on ph_public.federated_creden
 
 create index if not exists property_owner_idx on ph_public.property(owner_id);
 create index if not exists property_agent_idx on ph_public.property(agent_id);
+create index if not exists property_tenant_idx on ph_public.property(tenant_id);
+create index if not exists property_guest_idx on ph_public.property(guest_id);
 create index if not exists property_org_idx on ph_public.property(org_id);
 create index if not exists property_type_idx on ph_public.property(type);
 create index if not exists property_country_idx on ph_public.property(country);
