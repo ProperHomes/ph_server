@@ -59,6 +59,14 @@ create index if not exists message_by_user_idx on ph_public.message(by_user_id);
 create index if not exists message_to_user_idx on ph_public.message(to_user_id);
 create index if not exists message_created_at_idx on ph_public.message(created_at);
 
+create index if not exists rental_tenant_idx on ph_public.rental_agreement(tenant_id);
+create index if not exists rental_owner_idx on ph_public.rental_agreement(owner_id);
+create index if not exists rental_property_idx on ph_public.rental_agreement(property_id);
+
+create index if not exists schedule_tenant_idx on ph_public.property_visit_schedule(tenant_id);
+create index if not exists schedule_owner_idx on ph_public.property_visit_schedule(owner_id);
+create index if not exists schedule_property_idx on ph_public.property_visit_schedule(property_id);
+
 
 create index if not exists IDX_session_expire on ph_private.session("expire");
 
@@ -73,6 +81,14 @@ drop index if exists property_trgm_idx;
 drop index if exists property_fts_doc_en_idx;
 
 drop index if exists IDX_SESSION_EXPIRE;
+
+drop index if exists schedule_property_idx;
+drop index if exists schedule_owner_idx;
+drop index if exists schedule_tenant_idx;
+
+drop index if exists rental_property_idx;
+drop index if exists rental_owner_idx;
+drop index if exists rental_tenant_idx;
 
 drop index if exists message_created_at_idx;
 drop index if exists message_to_user_idx;

@@ -176,6 +176,7 @@ create table if not exists ph_public.property (
     tenant_id uuid references ph_public.user(id),
     guest_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
+    view_count bigint not null default 0, -- If property is listed within 24 hours and has more than a set number of views then add a popular/rising
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
@@ -202,14 +203,6 @@ create table if not exists ph_public.property_review (
     property_id uuid not null references ph_public.property(id) on delete cascade,
     content text not null,
     rating int, -- Note: should be between 1 to 5.
-    created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now()
-);
-
-create table if not exists ph_public.property_reach (
-    id uuid primary key default gen_random_uuid(),
-    user_id uuid not null references ph_public.user(id),
-    property_id uuid not null references ph_public.property(id),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -263,9 +256,30 @@ create table if not exists ph_public.message (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists ph_public.rental_agreement (
+    id uuid primary key default gen_random_uuid(),
+    tenant_id uuid not null references ph_public.user(id),
+    owner_id uuid not null references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
+    file_id uuid not null references ph_public.file(id),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_visit_schedule (
+    id uuid primary key default gen_random_uuid(),
+    tenant_id uuid not null references ph_public.user(id),
+    owner_id uuid not null references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
+    scheduled_at timestamptz not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 
 -- rambler down
-
+drop table if exists ph_public.property_visit_schedule;
+drop table if exists ph_public.rental_agreement;
 drop table if exists ph_public.message;
 drop table if exists ph_public.conversation;
 drop table if exists ph_public.notification;

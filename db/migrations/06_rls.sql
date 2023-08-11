@@ -11,6 +11,7 @@ alter table ph_public.notification enable row level security;
 alter table ph_public.conversation enable row level security;
 alter table ph_public.message enable row level security;
 alter table ph_public.property_report enable row level security;
+alter table ph_public.rental_agreement enable row level security;
 
 create policy select_user ON ph_public.user for select TO ph_user using (true);
 create policy update_user ON ph_public.user for update TO ph_user using (id = current_setting('jwt.claims.user_id', true)::uuid);
@@ -93,8 +94,33 @@ create policy update_message ON ph_public.message for update TO ph_user using (
   by_user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
+create policy select_rental_agreement ON ph_public.rental_agreement for select TO ph_user using (
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+create policy insert_rental_agreement ON ph_public.rental_agreement for insert TO ph_user with check (
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+
+
+create policy select_property_visit_schedule ON ph_public.property_visit_schedule for select TO ph_user using (
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+create policy insert_property_visit_schedule ON ph_public.property_visit_schedule for insert TO ph_user with check (
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+create policy update_property_visit_schedule ON ph_public.property_visit_schedule for update TO ph_user using (
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+
 -- rambler down
 
+
+drop policy if exists update_property_visit_schedule on ph_public.property_visit_schedule;
+drop policy if exists insert_property_visit_schedule on ph_public.property_visit_schedule;
+drop policy if exists select_property_visit_schedule on ph_public.property_visit_schedule;
+
+drop policy if exists insert_rental_agreement on ph_public.rental_agreement;
+drop policy if exists select_rental_agreement on ph_public.rental_agreement;
 
 drop policy if exists update_message on ph_public.message;
 drop policy if exists insert_message on ph_public.message;
