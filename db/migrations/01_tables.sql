@@ -80,6 +80,28 @@ create type ph_public.property_city as enum (
     'VISHAKAPATNAM'
 );
 
+
+create type ph_public.property_schedule_type as enum (
+    'ONLINE',
+    'OFFLINE'
+);
+
+create type ph_public.payment_mode as enum (
+    'UPI',
+    'CARD',
+    'NETBANKING',
+    'CASH'
+);
+
+create type ph_public.payment_for as enum (
+    'ADVANCE',
+    'RENT',
+    'SALE',
+    'MAINTENANCE',
+    'SERVICE',
+    'VIEW_CONTACT'
+);
+
 comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
 comment on type ph_public.property_status is E'@enum\n@enumName PropertyStatus';
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
@@ -87,6 +109,9 @@ comment on type ph_public.property_condition is E'@enum\n@enumName PropertyCondi
 comment on type ph_public.property_type is E'@enum\n@enumName PropertyType';
 comment on type ph_public.property_facing is E'@enum\n@enumName PropertyFacing';
 comment on type ph_public.user_type is E'@enum\n@enumName TypeOfUser';
+comment on type ph_public.property_schedule_type is E'@enum\n@enumName PropertVisitScheduleType'; 
+comment on type ph_public.payment_mode is E'@enum\n@enumName PaymentMode';
+comment on type ph_public.payment_for is E'@enum\n@enumName PaymentFor';
 
 create table if not exists ph_public.file (
     id uuid primary key default gen_random_uuid(),
@@ -262,6 +287,8 @@ create table if not exists ph_public.rental_agreement (
     owner_id uuid not null references ph_public.user(id),
     property_id uuid not null references ph_public.property(id),
     file_id uuid not null references ph_public.file(id),
+    start_date timestamptz not null,
+    end_date timestamptz not null, -- note: should be 11 months from start date by default.
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -272,12 +299,27 @@ create table if not exists ph_public.property_visit_schedule (
     owner_id uuid not null references ph_public.user(id),
     property_id uuid not null references ph_public.property(id),
     scheduled_at timestamptz not null,
+    type ph_public.property_schedule_type not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_payment (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    owner_id uuid references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
+    amount int not null,
+    payment_mode ph_public.payment_mode not null,
+    payment_for ph_public.payment_for not null,
+    transaction_id text not null,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
 
 
 -- rambler down
+drop table if exists ph_public.property_payment;
 drop table if exists ph_public.property_visit_schedule;
 drop table if exists ph_public.rental_agreement;
 drop table if exists ph_public.message;

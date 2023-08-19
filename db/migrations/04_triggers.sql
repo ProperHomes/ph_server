@@ -25,7 +25,6 @@ create trigger new_message after insert ON ph_public.message FOR EACH row execut
     );
 
 -- Todo: add a trigger to delete file from s3 when it is delete in our db.
--- Todo: add a trigger to update user attribs in listmonk when a user is updated.
 
 -- rambler down
 

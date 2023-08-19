@@ -66,7 +66,15 @@ create index if not exists rental_property_idx on ph_public.rental_agreement(pro
 create index if not exists schedule_tenant_idx on ph_public.property_visit_schedule(tenant_id);
 create index if not exists schedule_owner_idx on ph_public.property_visit_schedule(owner_id);
 create index if not exists schedule_property_idx on ph_public.property_visit_schedule(property_id);
+create index if not exists schedule_property_type_idx on ph_public.property_visit_schedule(type);
+create index if not exists schedule_property_created_idx on ph_public.property_visit_schedule(created_at);
 
+create index if not exists property_payment_user_idx on ph_public.property_payment(user_id);
+create index if not exists property_payment_owner_idx on ph_public.property_payment(owner_id);
+create index if not exists property_payment_property_idx on ph_public.property_payment(property_id);
+create index if not exists property_payment_payment_mode_idx on ph_public.property_payment(payment_mode);
+create index if not exists property_payment_payment_for_idx on ph_public.property_payment(payment_for);
+create index if not exists property_payment_created_idx on ph_public.property_payment(created_at);
 
 create index if not exists IDX_session_expire on ph_private.session("expire");
 
@@ -82,6 +90,15 @@ drop index if exists property_fts_doc_en_idx;
 
 drop index if exists IDX_SESSION_EXPIRE;
 
+drop index if exists property_payment_created_idx;
+drop index if exists property_payment_payment_for_idx;
+drop index if exists property_payment_payment_mode_idx;
+drop index if exists property_payment_property_idx;
+drop index if exists property_payment_owner_idx;
+drop index if exists property_payment_user_idx;
+
+drop index if exists schedule_property_created_idx;
+drop index if exists schedule_property_type_idx;
 drop index if exists schedule_property_idx;
 drop index if exists schedule_owner_idx;
 drop index if exists schedule_tenant_idx;
