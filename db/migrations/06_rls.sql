@@ -14,6 +14,7 @@ alter table ph_public.property_report enable row level security;
 alter table ph_public.rental_agreement enable row level security;
 alter table ph_public.property_visit_schedule enable row level security;
 alter table ph_public.property_payment enable row level security;
+alter table ph_public.membership enable row level security;
 
 create policy select_user ON ph_public.user for select TO ph_user using (true);
 create policy update_user ON ph_public.user for update TO ph_user using (id = current_setting('jwt.claims.user_id', true)::uuid);
@@ -121,7 +122,23 @@ create policy insert_property_payment ON ph_public.property_payment for insert T
   user_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
+
+create policy select_membership ON ph_public.membership for select TO ph_user using (
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+create policy insert_membership ON ph_public.membership for insert TO ph_user with check (
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+create policy update_membership ON ph_public.membership for update TO ph_user using (
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+
+
 -- rambler down
+
+drop policy if exists update_membership on ph_public.membership;
+drop policy if exists insert_membership on ph_public.membership;
+drop policy if exists select_membership on ph_public.membership;
 
 drop policy if exists insert_property_payment on ph_public.property_payment;
 drop policy if exists select_property_payment on ph_public.property_payment;

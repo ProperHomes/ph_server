@@ -76,6 +76,11 @@ create index if not exists property_payment_payment_mode_idx on ph_public.proper
 create index if not exists property_payment_payment_for_idx on ph_public.property_payment(payment_for);
 create index if not exists property_payment_created_idx on ph_public.property_payment(created_at);
 
+create index if not exists membership_user_idx on ph_public.membership(user_id);
+create index if not exists membership_next_payment_date_idx on ph_public.membership(next_payment_date);
+create index if not exists membership_type_idx on ph_public.membership(type);
+create index if not exists membership_created_at_idx on ph_public.membership(created_at);
+
 create index if not exists IDX_session_expire on ph_private.session("expire");
 
 
@@ -89,6 +94,11 @@ drop index if exists property_trgm_idx;
 drop index if exists property_fts_doc_en_idx;
 
 drop index if exists IDX_SESSION_EXPIRE;
+
+drop index if exists membership_created_at_idx;
+drop index if exists membership_type_idx;
+drop index if exists membership_next_payment_date_idx;
+drop index if exists membership_user_idx;
 
 drop index if exists property_payment_created_idx;
 drop index if exists property_payment_payment_for_idx;

@@ -102,6 +102,13 @@ create type ph_public.payment_for as enum (
     'VIEW_CONTACT'
 );
 
+create type ph_public.membership_type as enum (
+    'BUYER_TENANT_PLAN',
+    'SINGLE_PROPERTY', -- single property owner plan
+    'BUILDER', -- small time real state builders plan
+    'ORGANIZATION' -- Enterprise plan for big players like prestige, embassy etc.;
+);
+
 comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
 comment on type ph_public.property_status is E'@enum\n@enumName PropertyStatus';
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
@@ -304,6 +311,16 @@ create table if not exists ph_public.property_visit_schedule (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists ph_public.membership (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    amount int not null,
+    type ph_public.membership_type not null,
+    next_payment_date timestamptz not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 create table if not exists ph_public.property_payment (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references ph_public.user(id),
@@ -320,6 +337,7 @@ create table if not exists ph_public.property_payment (
 
 -- rambler down
 drop table if exists ph_public.property_payment;
+drop table if exists ph_public.membership;
 drop table if exists ph_public.property_visit_schedule;
 drop table if exists ph_public.rental_agreement;
 drop table if exists ph_public.message;
@@ -338,6 +356,7 @@ alter table ph_public.file drop column creator_id;
 drop table if exists ph_public.user;
 drop table if exists ph_public.file;
 
+drop type if exists ph_public.membership_type;
 drop type if exists ph_public.property_status;
 drop type if exists ph_public.listing_type;
 drop type if exists ph_public.property_facing;
