@@ -39,6 +39,8 @@ grant select, insert, update on table ph_public.rental_agreement to ph_user;
 grant select, insert, update on table ph_public.property_visit_schedule to ph_user;
 grant select, insert on table ph_public.property_payment to ph_user;
 grant select, insert, update on table ph_public.membership to ph_user;
+grant select, update, delete on table ph_public.pending_property_payment to ph_user;
+grant insert, update on table ph_public.pending_property_payment to ph_dev;
 
 grant usage, select on ALL sequences in schema ph_public to ph_user; 
 
@@ -63,6 +65,8 @@ revoke execute on function ph_public.current_user from ph_user;
 
 revoke usage, select on all sequences in schema ph_public from ph_user;
 
+revoke ALL on ph_public.pending_property_payment from ph_dev;
+revoke ALL on ph_public.pending_property_payment from ph_user;
 revoke ALL on ph_public.membership from ph_user;
 revoke ALL on ph_public.property_payment from ph_user;
 revoke ALL on ph_public.property_visit_schedule from ph_user;

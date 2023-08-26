@@ -92,7 +92,7 @@ const setupPostgraphileMiddleware = (app) =>
       ],
       derivedFieldDefinitions: [
         {
-          identifiers: ["ph_public.files.key"],
+          identifiers: ["ph_public.file.key"],
           inflect: () => `signedUrl`,
           resolve: resolveSignedUrl,
         },

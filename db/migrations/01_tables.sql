@@ -1,10 +1,13 @@
 -- rambler up
 
+-- Todo: anyone can be one or more of types listed below. 
+-- Todo: so this type might be irrelevant
 create type ph_public.user_type as enum (
     'SELLER',
     'AGENT',
     'BUYER',
-    'BOTH' -- A seller or a buyer account can be converted into BOTH seller & buyer account.
+    'TENANT',
+    'ADMIN'
 );
 
 create type ph_public.org_level_type as enum (
@@ -57,8 +60,8 @@ create type ph_public.property_status as enum (
     'REJECTED',
     'APPROVED',
     'SOLD',
-    'RENT',
-    'LEASE',
+    'RENTED',
+    'LEASED',
     'NOT_FOR_SALE',
     'NOT_FOR_RENT'
 );
@@ -192,7 +195,7 @@ create table if not exists ph_public.property (
     locality text,
     price text not null,
     area text not null, -- 2 Acres, 2000 sq.ft etc.;
-    sizes text not null, -- In Sq.Feet ranges ?
+    sizes text, -- In Sq.Feet ranges ?
     bedrooms int,
     bathrooms int,
     slug text unique,
@@ -204,7 +207,6 @@ create table if not exists ph_public.property (
     facing ph_public.property_facing,
     attributes jsonb default '{}'::jsonb,
     owner_id uuid references ph_public.user(id),
-    agent_id uuid references ph_public.user(id),
     tenant_id uuid references ph_public.user(id),
     guest_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
@@ -334,8 +336,20 @@ create table if not exists ph_public.property_payment (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists ph_public.pending_property_payment (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    owner_id uuid references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
+    amount int not null,
+    reminder_sent boolean,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 
 -- rambler down
+drop table if exists ph_public.pending_property_payment;
 drop table if exists ph_public.property_payment;
 drop table if exists ph_public.membership;
 drop table if exists ph_public.property_visit_schedule;

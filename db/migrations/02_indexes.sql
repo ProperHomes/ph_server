@@ -14,7 +14,6 @@ create index if not exists user_federated_cred_idx on ph_public.federated_creden
 
 
 create index if not exists property_owner_idx on ph_public.property(owner_id);
-create index if not exists property_agent_idx on ph_public.property(agent_id);
 create index if not exists property_tenant_idx on ph_public.property(tenant_id);
 create index if not exists property_guest_idx on ph_public.property(guest_id);
 create index if not exists property_org_idx on ph_public.property(org_id);
@@ -36,12 +35,14 @@ create index if not exists property_media_media_idx on ph_public.property_media(
 
 create index if not exists property_review_property_idx on ph_public.property_review(property_id);
 create index if not exists property_review_user_idx on ph_public.property_review(user_id);
+alter table ph_public.property_review add constraint property_review_constraint unique(user_id, property_id); 
 
 create index if not exists property_report_property_idx on ph_public.property_report(property_id);
 create index if not exists property_report_user_idx on ph_public.property_report(user_id);
 
 create index if not exists property_saved_user_idx on ph_public.saved_property(user_id);
 create index if not exists property_saved_prop_idx on ph_public.saved_property(property_id);
+create index if not exists property_saved_created_idx on ph_public.saved_property(created_at);
 alter table ph_public.saved_property add constraint saved_property_constraint unique(user_id, property_id); 
 
 create index if not exists notification_by_user_idx on ph_public.notification(by_user_id);
@@ -75,6 +76,13 @@ create index if not exists property_payment_property_idx on ph_public.property_p
 create index if not exists property_payment_payment_mode_idx on ph_public.property_payment(payment_mode);
 create index if not exists property_payment_payment_for_idx on ph_public.property_payment(payment_for);
 create index if not exists property_payment_created_idx on ph_public.property_payment(created_at);
+alter table ph_public.property_payment add constraint property_payment_user_unique_constraint unique(user_id, property_id); 
+
+create index if not exists pending_payment_user_idx on ph_public.pending_property_payment(user_id);
+create index if not exists pending_payment_owner_idx on ph_public.pending_property_payment(owner_id);
+create index if not exists pending_payment_property_idx on ph_public.pending_property_payment(property_id);
+create index if not exists pending_payment_created_idx on ph_public.pending_property_payment(created_at);
+create index if not exists pending_payment_reminder_sent_idx on ph_public.pending_property_payment(created_at);
 
 create index if not exists membership_user_idx on ph_public.membership(user_id);
 create index if not exists membership_next_payment_date_idx on ph_public.membership(next_payment_date);
@@ -99,6 +107,12 @@ drop index if exists membership_created_at_idx;
 drop index if exists membership_type_idx;
 drop index if exists membership_next_payment_date_idx;
 drop index if exists membership_user_idx;
+
+drop index if exists pending_payment_reminder_sent_idx;
+drop index if exists pending_payment_created_idx;
+drop index if exists pending_payment_property_idx;
+drop index if exists pending_payment_owner_idx;
+drop index if exists pending_payment_user_idx;
 
 drop index if exists property_payment_created_idx;
 drop index if exists property_payment_payment_for_idx;

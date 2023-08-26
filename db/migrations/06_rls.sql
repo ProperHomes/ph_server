@@ -116,7 +116,11 @@ create policy update_property_visit_schedule ON ph_public.property_visit_schedul
 );
 
 create policy select_property_payment ON ph_public.property_payment for select TO ph_user using (
-  user_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+    exists (
+      select 1 from ph_public.property p where 
+      p.id = ph_public.property_payment.property_id  and 
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
+    ) 
 );
 create policy insert_property_payment ON ph_public.property_payment for insert TO ph_user with check (
   user_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
@@ -133,8 +137,36 @@ create policy update_membership ON ph_public.membership for update TO ph_user us
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
+create policy select_pending_payment ON ph_public.pending_property_payment for select TO ph_user using (
+    exists (
+      select 1 from ph_public.property p where 
+      p.id = ph_public.property_payment.property_id  and 
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
+    ) 
+);
+create policy update_pending_payment ON ph_public.pending_property_payment for update TO ph_user using (
+    exists (
+      select 1 from ph_public.property p where 
+      p.id = ph_public.property_payment.property_id  and 
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
+    ) 
+);
+create policy insert_pending_payment ON ph_public.pending_property_payment for insert TO ph_dev with check (true);
+create policy delete_pending_payment_dev ON ph_public.pending_property_payment for delete TO ph_dev using (true);
+create policy delete_pending_payment ON ph_public.pending_property_payment for insert TO ph_user with check (
+    exists (
+      select 1 from ph_public.user u where 
+      u.id = current_setting('jwt.claims.user_id', true)::uuid and u.isSysAdmin = true
+    ) 
+);
 
 -- rambler down
+
+drop policy if exists delete_pending_payment on ph_public.pending_property_payment;
+drop policy if exists delete_pending_payment_dev on ph_public.pending_property_payment;
+drop policy if exists insert_pending_payment on ph_public.pending_property_payment;
+drop policy if exists select_pending_payment on ph_public.pending_property_payment;
+drop policy if exists select_pending_payment on ph_public.pending_property_payment;
 
 drop policy if exists update_membership on ph_public.membership;
 drop policy if exists insert_membership on ph_public.membership;

@@ -249,7 +249,7 @@ async function verifyPhoneNumberOtpAndLogin(req, res) {
 }
 
 async function sendPhoneNumberSmsOTP(req, res) {
-  const { phoneNumber, isForgotPassword, isCandidate, isSignup } = req.body;
+  const { phoneNumber, isForgotPassword, isSignup } = req.body;
   if (!phoneNumber) {
     return res
       .status(500)
@@ -263,9 +263,7 @@ async function sendPhoneNumberSmsOTP(req, res) {
       existsAlready = await getUserByPhoneNumber(phoneNumber);
       if (!!existsAlready) {
         return res.status(400).json({
-          error: `A ${
-            isCandidate ? "Candidate" : "Recruiter"
-          } with that phone number already exists`,
+          error: `An account with that phone number already exists`,
         });
       }
     } catch (err) {
