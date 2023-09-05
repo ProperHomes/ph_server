@@ -289,8 +289,9 @@ async function revalidateNextJSApp(req, res) {
   }
   try {
     await axios.post(
-      `${process.env.FRONTEND_URL}/api/revalidate?secret=${process.env.FRONTEND_REVALIDATE_SECRET}`,
+      `${process.env.FRONTEND_URL}/api/revalidate`,
       {
+        secret: process.env.FRONTEND_REVALIDATE_SECRET,
         path: req.body.path,
       },
       {

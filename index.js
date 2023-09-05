@@ -123,9 +123,7 @@ app.post("/change/forgot/password", authCheck, (req, res) => {
   }
 });
 app.post("/revalidate", authCheck, (req, res) => {
-  if (req.user.id === req.body.userId) {
-    revalidateNextJSApp(req, res);
-  }
+  revalidateNextJSApp(req, res);
 });
 
 app.get("/health", (_req, res) => {

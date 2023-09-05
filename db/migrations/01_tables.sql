@@ -214,6 +214,7 @@ create table if not exists ph_public.property (
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
+    in_auction boolean,
     fts_doc_en tsvector not null generated always as (
         to_tsvector('simple', slug)
     ) stored,

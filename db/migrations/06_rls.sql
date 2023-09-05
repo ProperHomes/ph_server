@@ -56,7 +56,7 @@ create policy insert_property_media ON ph_public.property_media for insert TO ph
     ) 
   ) 
 );
-create policy delete_property_media ON ph_public.property_media for delete TO ph_dev using (true); -- admin only
+create policy delete_property_media ON ph_public.property_media for delete TO ph_user using (true); -- admin only
 
 
 create policy select_saved_property ON ph_public.saved_property for select TO ph_user using (true);
