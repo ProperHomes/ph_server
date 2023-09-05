@@ -284,15 +284,15 @@ async function sendPhoneNumberSmsOTP(req, res) {
 }
 
 async function revalidateNextJSApp(req, res) {
-  if (!req.body.path) {
-    return res.status(500).json({ error: "revalidation path is required" });
+  if (!req.body.paths) {
+    return res.status(500).json({ error: "revalidation paths are required" });
   }
   try {
     await axios.post(
       `${process.env.FRONTEND_URL}/api/revalidate`,
       {
         secret: process.env.FRONTEND_REVALIDATE_SECRET,
-        path: req.body.path,
+        paths: req.body.paths,
       },
       {
         headers: { "content-type": "application/json" },
