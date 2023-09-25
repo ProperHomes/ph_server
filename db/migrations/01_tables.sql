@@ -23,14 +23,12 @@ create type ph_public.property_type as enum (
     'FLAT',
     'PG',
     'BUNGALOW',
-    'FARM_HOUSE',
-    'PENT_HOUSE',
-    'COUNTRY_HOME',
-    'CHATEAU',
-    'CABIN',
+    'FARM HOUSE',
+    'PENT HOUSE',
     'PROJECT',
     'COMMERCIAL'
     'HOSTEL',
+    'ROOM'
 );
 
 create type ph_public.property_condition as enum (
@@ -210,7 +208,7 @@ create table if not exists ph_public.property (
     tenant_id uuid references ph_public.user(id),
     guest_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
-    view_count bigint not null default 0, -- If property is listed within 24 hours and has more than a set number of views then add a popular/rising
+    view_count bigint default 0, -- If property is listed within 24 hours and has more than a set number of views then add a popular/rising
     status ph_public.property_status not null,
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
@@ -349,7 +347,28 @@ create table if not exists ph_public.pending_property_payment (
 );
 
 
+create table if not exists ph_public.property_insight (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_complaint (
+    id uuid primary key default gen_random_uuid(),
+    tenant_id uuid not null references ph_public.user(id) on delete cascade,
+    owner_id uuid not null references ph_public.user(id) on delete cascade,
+    property_id uuid not null references ph_public.property(id) on delete cascade,
+    complaint text not null,
+    resolved boolean default false,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 -- rambler down
+drop table if exists ph_public.property_complaint;
+drop table if exists ph_public.property_insight;
 drop table if exists ph_public.pending_property_payment;
 drop table if exists ph_public.property_payment;
 drop table if exists ph_public.membership;

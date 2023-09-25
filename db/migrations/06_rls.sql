@@ -15,6 +15,7 @@ alter table ph_public.rental_agreement enable row level security;
 alter table ph_public.property_visit_schedule enable row level security;
 alter table ph_public.property_payment enable row level security;
 alter table ph_public.membership enable row level security;
+alter table ph_public.property_insight enable row level security;
 
 create policy select_user ON ph_public.user for select TO ph_user using (true);
 create policy update_user ON ph_public.user for update TO ph_user using (id = current_setting('jwt.claims.user_id', true)::uuid);
@@ -140,27 +141,66 @@ create policy update_membership ON ph_public.membership for update TO ph_user us
 create policy select_pending_payment ON ph_public.pending_property_payment for select TO ph_user using (
     exists (
       select 1 from ph_public.property p where 
-      p.id = ph_public.property_payment.property_id  and 
+      p.id = ph_public.pending_property_payment.property_id  and 
       p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
 );
 create policy update_pending_payment ON ph_public.pending_property_payment for update TO ph_user using (
     exists (
       select 1 from ph_public.property p where 
-      p.id = ph_public.property_payment.property_id  and 
+      p.id = ph_public.pending_property_payment.property_id  and 
       p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
 );
 create policy insert_pending_payment ON ph_public.pending_property_payment for insert TO ph_dev with check (true);
 create policy delete_pending_payment_dev ON ph_public.pending_property_payment for delete TO ph_dev using (true);
-create policy delete_pending_payment ON ph_public.pending_property_payment for insert TO ph_user with check (
+create policy delete_pending_payment ON ph_public.pending_property_payment for delete TO ph_user using (
     exists (
-      select 1 from ph_public.user u where 
-      u.id = current_setting('jwt.claims.user_id', true)::uuid and u.isSysAdmin = true
+      select 1 from ph_public.property p where 
+      p.id = ph_public.property_payment.property_id  and 
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
 );
 
+create policy select_property_insight ON ph_public.property_insight for select to ph_user using (
+  exists (
+      select 1 from ph_public.property p where 
+      p.id = ph_public.property_insight.property_id  and 
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
+    ) 
+);
+create policy insert_property_insight ON ph_public.property_insight for insert TO ph_user with check (
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+
+
+create policy select_property_complaint ON ph_public.property_complaint for insert TO ph_user with check (
+  owner_id = current_setting('jwt.claims.user_id', true)::uuid or
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+create policy insert_property_complaint ON ph_public.property_complaint for insert TO ph_user with check (
+  owner_id = current_setting('jwt.claims.user_id', true)::uuid or
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+create policy delete_property_complaint ON ph_public.property_complaint for delete TO ph_user using (
+  owner_id = current_setting('jwt.claims.user_id', true)::uuid or
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+create policy update_property_complaint ON ph_public.property_complaint for delete TO ph_user using (
+  owner_id = current_setting('jwt.claims.user_id', true)::uuid or
+  tenant_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+
+
 -- rambler down
+
+drop policy if exists update_property_complaint on ph_public.property_complaint;
+drop policy if exists delete_property_complaint on ph_public.property_complaint;
+drop policy if exists insert_property_complaint on ph_public.property_complaint;
+drop policy if exists select_property_complaint on ph_public.property_complaint;
+
+drop policy if exists insert_property_insight on ph_public.property_insight;
+drop policy if exists select_property_insight on ph_public.property_insight;
 
 drop policy if exists delete_pending_payment on ph_public.pending_property_payment;
 drop policy if exists delete_pending_payment_dev on ph_public.pending_property_payment;
