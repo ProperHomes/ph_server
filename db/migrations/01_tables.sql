@@ -23,10 +23,9 @@ create type ph_public.property_type as enum (
     'FLAT',
     'PG',
     'BUNGALOW',
-    'FARM HOUSE',
-    'PENT HOUSE',
+    'FARM_HOUSE',
     'PROJECT',
-    'COMMERCIAL'
+    'COMMERCIAL',
     'HOSTEL',
     'ROOM'
 );
@@ -233,7 +232,7 @@ create table if not exists ph_public.property (
 
 create table if not exists ph_public.property_media (
     id uuid primary key default gen_random_uuid(),
-    property_id uuid not null references ph_public.property(id),
+    property_id uuid not null references ph_public.property(id) on delete cascade,
     media_id uuid references ph_public.file(id),
     media_url text,
     is_cover_image boolean not null default false,
@@ -243,7 +242,7 @@ create table if not exists ph_public.property_media (
 
 create table if not exists ph_public.property_review (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid not null references ph_public.user(id),
+    user_id uuid not null references ph_public.user(id) on delete cascade,
     property_id uuid not null references ph_public.property(id) on delete cascade,
     content text not null,
     rating int, -- Note: should be between 1 to 5.

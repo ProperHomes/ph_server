@@ -57,7 +57,7 @@ grant usage, select on ALL sequences in schema ph_public to ph_user;
 grant execute on function ph_public.current_user() to ph_user;
 grant execute on function ph_public.graphql_subscription() to ph_user;
 grant execute on function ph_public.broadcast(text, text) to ph_user;
-grant execute on function ph_public.search_properties(text, text, text) to ph_anon;
+grant execute on function ph_public.search_properties(text, text, text, int, text) to ph_anon;
 
 
 grant execute on function levenshtein(text, text) to ph_anon;

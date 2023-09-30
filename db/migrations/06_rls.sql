@@ -35,12 +35,10 @@ create policy insert_org ON ph_public.organization for insert TO ph_dev with che
 create policy select_property ON ph_public.property for select TO ph_anon using (true);
 create policy update_property ON ph_public.property for update TO ph_user using (
   owner_id = current_setting('jwt.claims.user_id', true)::uuid or
-  agent_id = current_setting('jwt.claims.user_id', true)::uuid or
   org_id = current_setting('jwt.claims.user_org_id', true)::uuid
 );
 create policy insert_property ON ph_public.property for insert TO ph_user with check (
   owner_id = current_setting('jwt.claims.user_id', true)::uuid or
-  agent_id = current_setting('jwt.claims.user_id', true)::uuid or
   org_id = current_setting('jwt.claims.user_org_id', true)::uuid
 );
 create policy delete_property ON ph_public.property for delete TO ph_dev using (true); -- admin only
@@ -52,8 +50,7 @@ create policy insert_property_media ON ph_public.property_media for insert TO ph
   exists ( 
     select 1 from ph_public.property as p where ( p.id = ph_public.property_media.property_id ) and 
     (
-      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid or
-      p.agent_id = current_setting('jwt.claims.user_id', true)::uuid
+      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
   ) 
 );
@@ -117,14 +114,15 @@ create policy update_property_visit_schedule ON ph_public.property_visit_schedul
 );
 
 create policy select_property_payment ON ph_public.property_payment for select TO ph_user using (
-    exists (
-      select 1 from ph_public.property p where 
-      p.id = ph_public.property_payment.property_id  and 
-      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
-    ) 
+  exists (
+    select 1 from ph_public.property as p where 
+    p.id = ph_public.property_payment.property_id  and 
+    p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
+  ) 
 );
 create policy insert_property_payment ON ph_public.property_payment for insert TO ph_user with check (
-  user_id = current_setting('jwt.claims.user_id', true)::uuid or owner_id = current_setting('jwt.claims.user_id', true)::uuid
+  user_id = current_setting('jwt.claims.user_id', true)::uuid or 
+  owner_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
 
@@ -140,7 +138,7 @@ create policy update_membership ON ph_public.membership for update TO ph_user us
 
 create policy select_pending_payment ON ph_public.pending_property_payment for select TO ph_user using (
     exists (
-      select 1 from ph_public.property p where 
+      select 1 from ph_public.property as p where 
       p.id = ph_public.pending_property_payment.property_id  and 
       p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
@@ -157,7 +155,7 @@ create policy delete_pending_payment_dev ON ph_public.pending_property_payment f
 create policy delete_pending_payment ON ph_public.pending_property_payment for delete TO ph_user using (
     exists (
       select 1 from ph_public.property p where 
-      p.id = ph_public.property_payment.property_id  and 
+      p.id = ph_public.pending_property_payment.property_id  and 
       p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
     ) 
 );

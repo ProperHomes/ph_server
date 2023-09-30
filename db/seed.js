@@ -6,23 +6,21 @@ const { pgPool } = require("./index");
 const dbClient = pgPool;
 
 const propertyTypes = [
-  'HOUSE',
-  'VILLA',
-  'LAND',
-  'APARTMENT',
-  'FLAT',
-  'PG',
-  'BUNGALOW',
-  'FARM_HOUSE',
-  'PENT_HOUSE',
-  'COUNTRY_HOME',
-  'CHATEAU',
-  'CABIN',
-  'PROJECT',
-  'COMMERCIAL'
+  "HOUSE",
+  "VILLA",
+  "LAND",
+  "APARTMENT",
+  "FLAT",
+  "PG",
+  "BUNGALOW",
+  "FARM_HOUSE",
+  "PROJECT",
+  "COMMERCIAL",
+  "HOSTEL",
+  "ROOM",
 ];
 
-export const ALL_CITIES = [
+const ALL_CITIES = [
   "AMALAPURAM",
   "BANGALORE",
   "BHIMAVARAM",
@@ -37,6 +35,16 @@ export const ALL_CITIES = [
   "RAJAHMUNDRY",
   "VIJAYAWADA",
   "VISHAKAPATNAM",
+];
+
+const AREA_UNITS = [
+  "cents",
+  "sq.ft",
+  "sq.mt",
+  "sq.yards",
+  "acres",
+  "hectares",
+  "guntha",
 ];
 
 const propertyConditions = ["OK", "GOOD", "VERY_GOOD", "AVERAGE"];
@@ -66,7 +74,7 @@ async function insertProperties({ numberOfRecords, ownerId }) {
   try {
     const insertQuery = `insert into ph_public.property(
       title, type, description, country, city, 
-      price, area, sizes, bedrooms, bathrooms, 
+      price, area, area_unit, bedrooms, bathrooms, 
       age, has_parking, has_basement, has_swimming_pool,
       is_furnished, owner_id, listed_for, condition, status, slug
     ) values (
@@ -76,13 +84,34 @@ async function insertProperties({ numberOfRecords, ownerId }) {
     ) returning *`;
 
     for (let i = 0; i < numberOfRecords; i++) {
-      const propertyType = faker.helpers.arrayElement(propertyTypes);
+      let propertyType = faker.helpers.arrayElement(propertyTypes);
       const listingType = faker.helpers.arrayElement(propertyListingType);
       const condition = faker.helpers.arrayElement(propertyConditions);
       const city = faker.helpers.arrayElement(ALL_CITIES);
       const title = faker.helpers.fake(
         `A ${propertyType} for ${listingType} in the city of ${city}`
       );
+      let areaUnit = faker.helpers.arrayElement(AREA_UNITS);
+      if (
+        propertyType === "LAND" ||
+        propertyType === "COMMERCIAL" ||
+        propertyType === "PROJECT"
+      ) {
+        areaUnit = "acres";
+      }
+      if (propertyType === "ROOM") {
+        areaUnit = "sq.ft";
+      }
+      let area = faker.number.int({ max: 100 });
+      if (areaUnit === "sq.ft" || areaUnit === "sq.mt") {
+        area = faker.number.int({ max: 5000 });
+      }
+      if (areaUnit === "cents") {
+        area = faker.number.int({ max: 100 });
+      }
+      if (areaUnit === "acres") {
+        area = faker.number.int({ max: 10 });
+      }
       const slug = `${propertyType.toLowerCase()}-for-${listingType.toLowerCase()}-in-${city.toLowerCase()}-${i}`;
       const res = await dbClient.query(insertQuery, [
         title,
@@ -91,8 +120,8 @@ async function insertProperties({ numberOfRecords, ownerId }) {
         "India",
         city,
         `${faker.number.int({ max: 10000000 })}`,
-        `2 acres`,
-        `1500 to 5000 sq.ft`,
+        area,
+        areaUnit,
         faker.number.int({ max: 6 }),
         faker.number.int({ max: 4 }),
         3,

@@ -183,6 +183,7 @@ drop index if exists property_created_idx;
 drop index if exists property_bedrooms_idx;
 drop index if exists property_slug_idx;
 drop index if exists property_status_idx;
+drop index if exists property_condition_idx;
 drop index if exists property_listed_for_idx;
 drop index if exists property_parking_idx;
 drop index if exists property_is_furnished_idx;
@@ -190,7 +191,8 @@ drop index if exists property_city_idx;
 drop index if exists property_country_idx;
 drop index if exists property_type_idx;
 drop index if exists property_org_idx;
-drop index if exists property_agent_idx;
+drop index if exists property_guest_idx;
+drop index if exists property_tenant_idx;
 drop index if exists property_owner_idx;
 
 drop index if exists user_federated_cred_idx;

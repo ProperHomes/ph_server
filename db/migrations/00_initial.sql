@@ -34,4 +34,4 @@ drop extension if exists "fuzzystrmatch";
 drop extension if exists "pg_trgm";
 
 drop schema if exists ph_private;
-drop schema if exists ph_public;
+drop schema if exists ph_public cascade;
