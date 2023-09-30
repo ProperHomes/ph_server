@@ -99,16 +99,26 @@ const setupPostgraphileMiddleware = (app) =>
       ],
     },
     pgSettings: (req) => {
+      const { FRONTEND_URL, AUTHORIZATION_SECRET } = process.env;
       const entity = req.user;
+      const { origin, authorization } = req.headers;
       if (req.isAuthenticated() && entity) {
         return {
           role: "ph_user",
           "jwt.claims.user_id": `${entity.id}`,
         };
       }
-      return {
-        role: "ph_anon",
-      };
+      const isFromAllowedHost = FRONTEND_URL === origin;
+      const isAnonAllowed = `Bearer ${AUTHORIZATION_SECRET}` === authorization;
+      if (isFromAllowedHost || isAnonAllowed) {
+        return {
+          role: "ph_anon",
+        };
+      } else {
+        return {
+          role: "NOT_AUTHORIZED",
+        };
+      }
     },
   });
 

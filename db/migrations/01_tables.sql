@@ -110,6 +110,16 @@ create type ph_public.membership_type as enum (
     'ORGANIZATION' -- Enterprise plan for big players like prestige, embassy etc.;
 );
 
+create type ph_public.area_type as enum (
+    'cents',
+    'sq.ft',
+    'sq.mt',
+    'sq.yards',
+    'acres',
+    'hectares',
+    'guntha'
+);
+
 comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
 comment on type ph_public.property_status is E'@enum\n@enumName PropertyStatus';
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
@@ -120,6 +130,7 @@ comment on type ph_public.user_type is E'@enum\n@enumName TypeOfUser';
 comment on type ph_public.property_schedule_type is E'@enum\n@enumName PropertVisitScheduleType'; 
 comment on type ph_public.payment_mode is E'@enum\n@enumName PaymentMode';
 comment on type ph_public.payment_for is E'@enum\n@enumName PaymentFor';
+comment on type ph_public.area_type is E'@enum\n@enumName AreaUnit';
 
 create table if not exists ph_public.file (
     id uuid primary key default gen_random_uuid(),
@@ -192,12 +203,12 @@ create table if not exists ph_public.property (
     city ph_public.property_city not null,
     locality text,
     price text not null,
-    area text not null, -- 2 Acres, 2000 sq.ft etc.;
-    sizes text, -- In Sq.Feet ranges ?
+    area int not null,
+    area_unit ph_public.area_type not null,
     bedrooms int,
     bathrooms int,
     slug text unique,
-    age int, -- in months
+    age int, -- in years
     has_parking boolean,
     has_basement boolean,
     has_swimming_pool boolean,
@@ -390,6 +401,7 @@ alter table ph_public.file drop column creator_id;
 drop table if exists ph_public.user;
 drop table if exists ph_public.file;
 
+drop type if exists ph_public.area_type;
 drop type if exists ph_public.membership_type;
 drop type if exists ph_public.property_status;
 drop type if exists ph_public.listing_type;
