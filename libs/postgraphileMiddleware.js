@@ -99,9 +99,13 @@ const setupPostgraphileMiddleware = (app) =>
       ],
     },
     pgSettings: (req) => {
+      // Todo: Auth_secret should be renamed as CI_SECRET
       const { FRONTEND_URL, AUTHORIZATION_SECRET } = process.env;
       const entity = req.user;
       const { origin, authorization } = req.headers;
+      const userAgentArr = req.headers["user-agent"].split(" ");
+      const isMobileApp =
+        userAgentArr.length > 0 && userAgentArr[0] === "ProperHomes/1";
       if (req.isAuthenticated() && entity) {
         return {
           role: "ph_user",
@@ -109,8 +113,8 @@ const setupPostgraphileMiddleware = (app) =>
         };
       }
       const isFromAllowedHost = FRONTEND_URL === origin;
-      const isAnonAllowed = `Bearer ${AUTHORIZATION_SECRET}` === authorization;
-      if (isFromAllowedHost || isAnonAllowed) {
+      const isAnonAllowed = AUTHORIZATION_SECRET === authorization;
+      if (isFromAllowedHost || isAnonAllowed || isMobileApp) {
         return {
           role: "ph_anon",
         };
