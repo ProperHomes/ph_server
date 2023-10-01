@@ -201,7 +201,7 @@ create table if not exists ph_public.property (
     country text not null,
     city ph_public.property_city not null,
     locality text,
-    price text not null,
+    price int not null,
     area int not null,
     area_unit ph_public.area_type not null,
     bedrooms int,

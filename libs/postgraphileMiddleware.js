@@ -103,9 +103,14 @@ const setupPostgraphileMiddleware = (app) =>
       const { FRONTEND_URL, AUTHORIZATION_SECRET } = process.env;
       const entity = req.user;
       const { origin, authorization } = req.headers;
-      const userAgentArr = req.headers["user-agent"].split(" ");
-      const isMobileApp =
-        userAgentArr.length > 0 && userAgentArr[0] === "ProperHomes/1";
+      let isMobileApp = false;
+      const userAgent = req.headers["user-agent"];
+      if (userAgent) {
+        const userAgentArr = req.headers["user-agent"].split(" ");
+        isMobileApp = !!(
+          userAgentArr.length > 0 && userAgentArr[0] === "ProperHomes/1"
+        );
+      }
       if (req.isAuthenticated() && entity) {
         return {
           role: "ph_user",

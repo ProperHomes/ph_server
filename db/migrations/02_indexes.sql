@@ -28,6 +28,7 @@ create index if not exists property_status_idx on ph_public.property(status);
 create index if not exists property_slug_idx on ph_public.property(slug);
 create index if not exists property_bedrooms_idx on ph_public.property(bedrooms);
 create index if not exists property_created_idx on ph_public.property(created_at);
+create index if not exists property_price_idx on ph_public.property(price);
 
 
 create index if not exists property_media_prop_idx on ph_public.property_media(property_id);
