@@ -41,7 +41,11 @@ grant select, insert, update on table ph_public.property_visit_schedule to ph_us
 
 grant select, insert on table ph_public.property_payment to ph_user;
 
-grant select, insert, update on table ph_public.membership to ph_user;
+grant select, insert, update on table ph_public.subscription_purchase to ph_user;
+
+grant select, insert on table ph_public.credits_purchase to ph_user;
+
+grant select, insert on table ph_public.property_credit_expense to ph_user;
 
 grant select, update, delete on table ph_public.pending_property_payment to ph_user;
 
@@ -78,7 +82,9 @@ revoke ALL on ph_public.property_complaint from ph_user;
 revoke ALL on ph_public.property_insight from ph_user;
 revoke ALL on ph_public.pending_property_payment from ph_dev;
 revoke ALL on ph_public.pending_property_payment from ph_user;
-revoke ALL on ph_public.membership from ph_user;
+revoke ALL on ph_public.property_credit_expense from ph_user;
+revoke ALL on ph_public.credits_purchase from ph_user;
+revoke ALL on ph_public.subscription from ph_user;
 revoke ALL on ph_public.property_payment from ph_user;
 revoke ALL on ph_public.property_visit_schedule from ph_user;
 revoke ALL on ph_public.rental_agreement from ph_user;

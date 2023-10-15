@@ -14,7 +14,9 @@ alter table ph_public.property_report enable row level security;
 alter table ph_public.rental_agreement enable row level security;
 alter table ph_public.property_visit_schedule enable row level security;
 alter table ph_public.property_payment enable row level security;
-alter table ph_public.membership enable row level security;
+alter table ph_public.subscription_purchase enable row level security;
+alter table ph_public.credits_purchase enable row level security;
+alter table ph_public.property_credit_expense enable row level security;
 alter table ph_public.property_insight enable row level security;
 
 create policy select_user ON ph_public.user for select TO ph_user using (true);
@@ -126,14 +128,29 @@ create policy insert_property_payment ON ph_public.property_payment for insert T
 );
 
 
-create policy select_membership ON ph_public.membership for select TO ph_user using (
+create policy select_subscription_purchase ON ph_public.subscription_purchase for select TO ph_user using (
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
-create policy insert_membership ON ph_public.membership for insert TO ph_user with check (
+create policy insert_subscription_purchase ON ph_public.subscription_purchase for insert TO ph_user with check (
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
-create policy update_membership ON ph_public.membership for update TO ph_user using (
+create policy update_subscription_purchase ON ph_public.subscription_purchase for update TO ph_user using (
   user_id = current_setting('jwt.claims.user_id', true)::uuid
+);
+
+create policy select_credits_purchase ON ph_public.credits_purchase for select TO ph_user using ( 
+  user_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+create policy insert_credits_purchase ON ph_public.credits_purchase for insert TO ph_user with check ( 
+  user_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+
+create policy select_property_credit_expense ON ph_public.property_credit_expense for select TO ph_user using ( 
+  user_id = current_setting('jwt.claims.user_id', true)::uuid 
+);
+
+create policy insert_property_credit_expense ON ph_public.property_credit_expense for insert TO ph_user with check ( 
+  user_id = current_setting('jwt.claims.user_id', true)::uuid 
 );
 
 create policy select_pending_payment ON ph_public.pending_property_payment for select TO ph_user using (
@@ -206,9 +223,15 @@ drop policy if exists insert_pending_payment on ph_public.pending_property_payme
 drop policy if exists select_pending_payment on ph_public.pending_property_payment;
 drop policy if exists select_pending_payment on ph_public.pending_property_payment;
 
-drop policy if exists update_membership on ph_public.membership;
-drop policy if exists insert_membership on ph_public.membership;
-drop policy if exists select_membership on ph_public.membership;
+drop policy if exists insert_property_credit_expense on ph_public.property_credit_expense;
+drop policy if exists select_property_credit_expense on ph_public.property_credit_expense;
+
+drop policy if exists insert_credits_purchase on ph_public.credits_purchase;
+drop policy if exists select_credits_purchase on ph_public.credits_purchase;
+
+drop policy if exists update_subscription_purchase on ph_public.subscription_purchase;
+drop policy if exists insert_subscription_purchase on ph_public.subscription_purchase;
+drop policy if exists select_subscription_purchase on ph_public.subscription_purchase;
 
 drop policy if exists insert_property_payment on ph_public.property_payment;
 drop policy if exists select_property_payment on ph_public.property_payment;

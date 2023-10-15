@@ -4,7 +4,7 @@ create index if not exists user_avatar_idx on ph_public.user(avatar_id);
 create index if not exists user_cover_image_idx on ph_public.user(cover_image_id);
 create index if not exists user_type_idx on ph_public.user(type);
 create index if not exists user_org_idx on ph_public.user(org_id);
-create index if not exists user_viewed_free_idx on ph_public.user(viewed_free);
+create index if not exists user_credits_idx on ph_public.user(credits);
 
 create index if not exists org_logo_idx on ph_public.organization(logo_id);
 
@@ -25,6 +25,7 @@ create index if not exists property_parking_idx on ph_public.property(has_parkin
 create index if not exists property_listed_for_idx on ph_public.property(listed_for);
 create index if not exists property_condition_idx on ph_public.property(condition);
 create index if not exists property_status_idx on ph_public.property(status);
+create index if not exists property_listing_status_idx on ph_public.property(listing_status);
 create index if not exists property_slug_idx on ph_public.property(slug);
 create index if not exists property_bedrooms_idx on ph_public.property(bedrooms);
 create index if not exists property_created_idx on ph_public.property(created_at);
@@ -85,10 +86,17 @@ create index if not exists pending_payment_owner_idx on ph_public.pending_proper
 create index if not exists pending_payment_property_idx on ph_public.pending_property_payment(property_id);
 create index if not exists pending_payment_created_idx on ph_public.pending_property_payment(created_at);
 
-create index if not exists membership_user_idx on ph_public.membership(user_id);
-create index if not exists membership_next_payment_date_idx on ph_public.membership(next_payment_date);
-create index if not exists membership_type_idx on ph_public.membership(type);
-create index if not exists membership_created_at_idx on ph_public.membership(created_at);
+create index if not exists subscription_purchase_user_idx on ph_public.subscription_purchase(user_id);
+create index if not exists subscription_purchase_next_payment_date_idx on ph_public.subscription_purchase(next_payment_date);
+create index if not exists subscription_purchase_type_idx on ph_public.subscription_purchase(type);
+create index if not exists subscription_purchase_created_at_idx on ph_public.subscription_purchase(created_at);
+
+create index if not exists credits_purchase_user_idx on ph_public.credits_purchase(user_id);
+
+create index if not exists property_credit_expense_user_idx on ph_public.property_credit_expense(user_id);
+create index if not exists property_credit_expense_prop_idx on ph_public.property_credit_expense(property_id);
+create index if not exists property_credit_expense_created_idx on ph_public.property_credit_expense(created_at);
+alter table ph_public.property_credit_expense add constraint property_credit_expense_unique_constraint unique(user_id, property_id);
 
 create index if not exists property_insight_user_idx on ph_public.property_insight(user_id);
 create index if not exists property_insight_property_idx on ph_public.property_insight(property_id);
@@ -124,10 +132,17 @@ drop index if exists property_insight_created_idx;
 drop index if exists property_insight_property_idx;
 drop index if exists property_insight_user_idx;
 
-drop index if exists membership_created_at_idx;
-drop index if exists membership_type_idx;
-drop index if exists membership_next_payment_date_idx;
-drop index if exists membership_user_idx;
+alter table ph_public.property_credit_expense drop constraint property_credit_expense_unique_constraint;
+drop index if exists property_credit_expense_created_idx;
+drop index if exists property_credit_expense_prop_idx;
+drop index if exists property_credit_expense_user_idx;
+
+drop index if exists credits_purchase_user_idx;
+
+drop index if exists subscription_purchase_created_at_idx;
+drop index if exists subscription_purchase_type_idx;
+drop index if exists subscription_purchsse_next_payment_date_idx;
+drop index if exists subscription_user_idx;
 
 drop index if exists pending_payment_created_idx;
 drop index if exists pending_payment_property_idx;
@@ -183,6 +198,7 @@ drop index if exists property_media_prop_idx;
 drop index if exists property_created_idx;
 drop index if exists property_bedrooms_idx;
 drop index if exists property_slug_idx;
+drop index if exists property_listing_status_idx;
 drop index if exists property_status_idx;
 drop index if exists property_condition_idx;
 drop index if exists property_listed_for_idx;
@@ -201,7 +217,8 @@ drop index if exists file_creator_id;
 
 drop index if exists org_logo_idx;
 
-drop index if exists user_viewed_free_idx;
+drop index if exists user_credits_idx;
+drop index if exists user_viewed_free_idx; -- Todo: remove this
 drop index if exists user_org_idx;
 drop index if exists user_type;
 drop index if exists user_cover_image_idx;

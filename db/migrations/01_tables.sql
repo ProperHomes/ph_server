@@ -1,7 +1,5 @@
 -- rambler up
 
--- Todo: anyone can be one or more of types listed below. 
--- Todo: so this type might be irrelevant
 create type ph_public.user_type as enum (
     'SELLER',
     'AGENT',
@@ -51,16 +49,20 @@ create type ph_public.listing_type as enum (
     'LEASE'
 );
 
-create type ph_public.property_status as enum (
+create type ph_public.listing_status as enum (
     'DRAFT',
     'IN_REVIEW',
     'REJECTED',
-    'APPROVED',
+    'APPROVED'
+);
+
+create type ph_public.property_status as enum (
     'SOLD',
     'RENTED',
     'LEASED',
     'NOT_FOR_SALE',
-    'NOT_FOR_RENT'
+    'NOT_FOR_RENT',
+    'UNDER_CONSTRUCTION'
 );
 
 create type ph_public.property_city as enum (
@@ -99,14 +101,14 @@ create type ph_public.payment_for as enum (
     'SALE',
     'MAINTENANCE',
     'SERVICE',
-    'VIEW_CONTACT'
 );
 
-create type ph_public.membership_type as enum (
-    'BUYER_TENANT_PLAN',
-    'SINGLE_PROPERTY', -- single property owner plan
-    'BUILDER', -- small time real state builders plan
-    'ORGANIZATION' -- Enterprise plan for big players like prestige, embassy etc.;
+create type ph_public.subscription_type as enum (
+    'FREE',
+    'PRIME',
+    'PREMIUM',
+    'CUSTOM',
+    'ENTERPRISE'
 );
 
 create type ph_public.area_type as enum (
@@ -121,6 +123,7 @@ create type ph_public.area_type as enum (
 
 comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
 comment on type ph_public.property_status is E'@enum\n@enumName PropertyStatus';
+comment on type ph_public.listing_status is E'@enum\n@enumName ListingStatus';
 comment on type ph_public.listing_type is E'@enum\n@enumName TypeOfListing';
 comment on type ph_public.property_condition is E'@enum\n@enumName PropertyConditionType';
 comment on type ph_public.property_type is E'@enum\n@enumName PropertyType';
@@ -130,6 +133,7 @@ comment on type ph_public.property_schedule_type is E'@enum\n@enumName PropertVi
 comment on type ph_public.payment_mode is E'@enum\n@enumName PaymentMode';
 comment on type ph_public.payment_for is E'@enum\n@enumName PaymentFor';
 comment on type ph_public.area_type is E'@enum\n@enumName AreaUnit';
+comment on type ph_public.subscription_type is E'@enum\n@enumName SubscriptionType';
 
 create table if not exists ph_public.file (
     id uuid primary key default gen_random_uuid(),
@@ -154,7 +158,8 @@ create table if not exists ph_public.user (
     city text not null,
     avatar_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
-    viewed_free boolean default false,
+    is_sys_admin boolean default false,
+    credits int default 3,
     attributes jsonb default '{}'::jsonb,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
@@ -201,6 +206,7 @@ create table if not exists ph_public.property (
     country text not null,
     city ph_public.property_city not null,
     locality text,
+    pincode int not null,
     price int not null,
     area int not null,
     area_unit ph_public.area_type not null,
@@ -220,6 +226,7 @@ create table if not exists ph_public.property (
     org_id uuid references ph_public.organization(id),
     view_count bigint default 0, -- If property is listed within 24 hours and has more than a set number of views then add a popular/rising
     status ph_public.property_status not null,
+    listing_status ph_public.listing_status not null default 'DRAFT',
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
     in_auction boolean,
@@ -322,12 +329,29 @@ create table if not exists ph_public.property_visit_schedule (
     updated_at timestamptz not null default now()
 );
 
-create table if not exists ph_public.membership (
+create table if not exists ph_public.subscription_purchase (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references ph_public.user(id),
     amount int not null,
-    type ph_public.membership_type not null,
+    type ph_public.subscription_type not null default 'FREE',
     next_payment_date timestamptz not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.credits_purchase (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    amount int not null,
+    count int not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create table if not exists ph_public.property_credit_expense (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references ph_public.user(id),
+    property_id uuid not null references ph_public.property(id);
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -381,7 +405,9 @@ drop table if exists ph_public.property_complaint;
 drop table if exists ph_public.property_insight;
 drop table if exists ph_public.pending_property_payment;
 drop table if exists ph_public.property_payment;
-drop table if exists ph_public.membership;
+drop table if exists ph_public.property_credit_expense;
+drop table if exists ph_public.credits_purchase;
+drop table if exists ph_public.subscription_purchase;
 drop table if exists ph_public.property_visit_schedule;
 drop table if exists ph_public.rental_agreement;
 drop table if exists ph_public.message;
@@ -401,7 +427,7 @@ drop table if exists ph_public.user;
 drop table if exists ph_public.file;
 
 drop type if exists ph_public.area_type;
-drop type if exists ph_public.membership_type;
+drop type if exists ph_public.subscription_type;
 drop type if exists ph_public.property_status;
 drop type if exists ph_public.listing_type;
 drop type if exists ph_public.property_facing;
