@@ -6,13 +6,13 @@ import { checkSmsVerificationToken, twilioClient } from "./twilio";
 const axios = require("axios/dist/node/axios.cjs"); // node
 
 async function signup(req) {
-  const { phoneNumber, password, name, type } = req.body;
+  const { phoneNumber, password, name, type, city, country } = req.body;
   let newUser;
   try {
     const hasedPassword = await bcrypt.hash(password, 10);
     const newRes = await pgPool.query(
-      `insert into ph_public.user (password_hash, phone_number, name, type) values ($1, $2, $3, $4) returning *`,
-      [hasedPassword, phoneNumber, name, type]
+      `insert into ph_public.user (password_hash, phone_number, name, type, country, city) values ($1, $2, $3, $4, $5, $6) returning *`,
+      [hasedPassword, phoneNumber, name, type, country, city]
     );
     newUser = newRes.rows[0];
   } catch (err) {
@@ -229,7 +229,9 @@ async function verifyPhoneNumberOtpAndLogin(req, res) {
   try {
     const isValid = await checkSmsVerificationToken(phoneNumber, otp);
     if (isValid) {
-      const user = await getUserByPhoneNumber(phoneNumber);
+      const phoneNo =
+        phoneNumber[0] === "+" ? phoneNumber.slice(1) : phoneNumber;
+      const user = await getUserByPhoneNumber(phoneNo);
       return await req.logIn(user, (err) => {
         if (err) {
           return res.status(500).json({
