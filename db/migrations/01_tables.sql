@@ -100,7 +100,7 @@ create type ph_public.payment_for as enum (
     'RENT',
     'SALE',
     'MAINTENANCE',
-    'SERVICE',
+    'SERVICE'
 );
 
 create type ph_public.subscription_type as enum (
@@ -159,7 +159,7 @@ create table if not exists ph_public.user (
     avatar_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
     is_sys_admin boolean default false,
-    credits int default 3,
+    credits int default 1,
     attributes jsonb default '{}'::jsonb,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
@@ -220,6 +220,7 @@ create table if not exists ph_public.property (
     is_furnished boolean, 
     facing ph_public.property_facing,
     attributes jsonb default '{}'::jsonb,
+    rera_id text,
     owner_id uuid references ph_public.user(id),
     tenant_id uuid references ph_public.user(id),
     guest_id uuid references ph_public.user(id),
@@ -351,7 +352,7 @@ create table if not exists ph_public.credits_purchase (
 create table if not exists ph_public.property_credit_expense (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references ph_public.user(id),
-    property_id uuid not null references ph_public.property(id);
+    property_id uuid not null references ph_public.property(id),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

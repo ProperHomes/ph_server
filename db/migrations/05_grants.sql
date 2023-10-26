@@ -84,7 +84,7 @@ revoke ALL on ph_public.pending_property_payment from ph_dev;
 revoke ALL on ph_public.pending_property_payment from ph_user;
 revoke ALL on ph_public.property_credit_expense from ph_user;
 revoke ALL on ph_public.credits_purchase from ph_user;
-revoke ALL on ph_public.subscription from ph_user;
+revoke ALL on ph_public.subscription_purchase from ph_user;
 revoke ALL on ph_public.property_payment from ph_user;
 revoke ALL on ph_public.property_visit_schedule from ph_user;
 revoke ALL on ph_public.rental_agreement from ph_user;

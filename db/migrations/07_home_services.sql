@@ -25,7 +25,7 @@ create table if not exists ph_public.home_service (
     price int not null,
     is_active boolean not null,
     image_id uuid references ph_public.file(id),
-    professional_id not null references ph_public.user(id),
+    professional_id uuid not null references ph_public.user(id),
     status ph_public.home_service_status not null,
     category ph_public.home_service_category not null,
     created_at timestamptz not null default now(),
@@ -60,8 +60,14 @@ create index if not exists home_service_status_idx on ph_public.home_service(sta
 create index if not exists home_service_active_idx on ph_public.home_service(is_active);
 create index if not exists home_service_created_idx on ph_public.home_service(created_at);
 
-create index if not exists home_service_review_prof_idx on ph_public.home_service_order(professional_id);
-create index if not exists home_service_review_service_idx on ph_public.home_service_order(service_id);
+create index if not exists home_service_order_user_idx on ph_public.home_service_order(user_id);
+create index if not exists home_service_order_service_idx on ph_public.home_service_order(service_id);
+create index if not exists home_service_order_created_idx on ph_public.home_service_order(created_at);
+
+create index if not exists home_service_review_user_idx on ph_public.home_service_review(user_id);
+create index if not exists home_service_review_prof_idx on ph_public.home_service_review(professional_id);
+create index if not exists home_service_review_service_idx on ph_public.home_service_review(service_id);
+create index if not exists home_service_review_created_idx on ph_public.home_service_review(created_at);
 
 
 grant select on table ph_public.home_service to ph_anon;
@@ -95,7 +101,7 @@ create policy update_home_service_order ON ph_public.home_service_order for upda
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 create policy insert_home_service_order ON ph_public.home_service_order for insert TO ph_user with check (
-  professional_id = current_setting('jwt.claims.user_id', true)::uuid or
+  user_id = current_setting('jwt.claims.user_id', true)::uuid or
   exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
 );
 
@@ -104,9 +110,46 @@ create policy select_home_service_review ON ph_public.home_service_review for se
 create policy update_home_service_review ON ph_public.home_service_review for update TO ph_user using (
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
-create policy insert_home_service_order ON ph_public.home_service_review for insert TO ph_user with check (
+create policy insert_home_service_review ON ph_public.home_service_review for insert TO ph_user with check (
   user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
 
 -- rambler down
+
+drop policy if exists insert_home_service_review on ph_public.home_service_review;
+drop policy if exists update_home_service_review on ph_public.home_service_review;
+drop policy if exists select_home_service_review on ph_public.home_service_review;
+
+drop policy if exists insert_home_service_order on ph_public.home_service_order;
+drop policy if exists update_home_service_order on ph_public.home_service_order;
+drop policy if exists select_home_service_order on ph_public.home_service_order;
+
+drop policy if exists insert_home_service on ph_public.home_service;
+drop policy if exists update_home_service on ph_public.home_service;
+drop policy if exists select_home_service on ph_public.home_service;
+
+revoke ALL on ph_public.home_service_review from ph_user;
+revoke ALL on ph_public.home_service_review from ph_anon;
+revoke ALL on ph_public.home_service_order from ph_user;
+revoke ALL on ph_public.home_service from ph_user;
+revoke ALL on ph_public.home_service from ph_anon;
+
+drop index if exists home_service_review_created_idx;
+drop index if exists home_service_review_service_idx;
+drop index if exists home_service_review_prof_idx;
+drop index if exists home_service_review_user_idx;
+drop index if exists home_service_order_created_idx;
+drop index if exists home_service_order_service_idx;
+drop index if exists home_service_order_user_idx;
+drop index if exists home_service_created_idx;
+drop index if exists home_service_active_idx;
+drop index if exists home_service_status_idx;
+drop index if exists home_service_category_idx;
+drop index if exists home_service_prof_idx;
+
+drop table if exists ph_public.home_service_review;
+drop table if exists ph_public.home_service_order;
+drop table if exists ph_public.home_service;
+drop type if exists ph_public.home_service_category;
+drop type if exists ph_public.home_service_status;
