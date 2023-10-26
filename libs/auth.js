@@ -133,71 +133,6 @@ async function getUserByPhoneNumber(phoneNumber) {
   }
 }
 
-async function verifyProvider({ issuer, profile, cb }) {
-  let user;
-  let userFederatedCredential;
-  const { emails, name, id: providerId } = profile;
-  const profileEmail = emails[0] && emails[0].value;
-  try {
-    const credentialRes = await pgPool.query(
-      `select * FROM ph_public.federated_credential WHERE provider = $1 and provider_id = $2`,
-      [issuer, profile.id]
-    );
-    userFederatedCredential = credentialRes.rows[0];
-  } catch (err) {
-    console.log(err);
-  }
-
-  if (userFederatedCredential && userFederatedCredential.user_id) {
-    try {
-      const userRes = await pgPool.query(
-        `select * FROM ph_public.user WHERE id = $1 or email=$2`,
-        [userFederatedCredential.user_id, profileEmail]
-      );
-      user = userRes.rows[0];
-      if (user) {
-        return cb(null, user);
-      } else {
-        return cb(null, false);
-      }
-    } catch (err) {
-      return cb(err);
-    }
-  }
-  const dbClient = await pgPool.connect();
-  try {
-    const userRes = await pgPool.query(
-      `select * FROM ph_public.user where email = $1`,
-      [profileEmail]
-    );
-    user = userRes.rows[0];
-    if (user) {
-      await pgPool.query(
-        `insert into ph_public.federated_credential(provider, provider_id, user_id) values($1, $2, $3)`,
-        [issuer, providerId, user.id]
-      );
-    } else {
-      await dbClient.query("BEGIN");
-      const newUserRes = await dbClient.query(
-        `insert into ph_public.user(name, email, email_verified) values($1, $2, $3) returning *`,
-        [name.givenName, profileEmail, true]
-      );
-      user = newUserRes.rows[0];
-      await dbClient.query(
-        `insert into ph_public.federated_credential(provider, provider_id, user_id) values($1, $2, $3)`,
-        [issuer, providerId, user.id]
-      );
-      await dbClient.query("COMMIT");
-    }
-    return cb(null, user);
-  } catch (err) {
-    await dbClient.query("ROLLBACK");
-    cb(err);
-  } finally {
-    dbClient.release();
-  }
-}
-
 async function verifyPhoneNumberOtp(req, res) {
   const { phoneNumber, otp } = req.body;
   if (!phoneNumber || !otp) {
@@ -313,7 +248,6 @@ export {
   forgotPasswordChange,
   getUserByEmail,
   getUserByPhoneNumber,
-  verifyProvider,
   verifyPhoneNumberOtp,
   sendPhoneNumberSmsOTP,
   verifyPhoneNumberOtpAndLogin,

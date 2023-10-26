@@ -8,8 +8,6 @@ const {
   signup,
 } = require("../libs/auth");
 
-// Todo: very important: either move these to a custom graphql mutations or sanitize the req data; install express-validator ?
-
 router.get("/login/failed", (req, res) => {
   res.status(401).json({
     success: false,
@@ -42,70 +40,6 @@ router.post(
     }
   }
 );
-
-router.post(
-  "/login/email",
-  passport.authenticate("local-login-email", {
-    failureRedirect: "/auth/login/failed",
-  }),
-  (req, res) => {
-    if (req.user && req.user.id) {
-      return res.status(200).json({ status: "success", userId: req.user.id });
-    }
-  }
-);
-
-router.post(
-  "/login/email-link",
-  passport.authenticate("magiclink", {
-    action: "requestToken",
-    failureRedirect: "/auth/login/failed",
-    failureMessage: true,
-  }),
-  (req, res, next) => {
-    res.status(200).json({ status: "success" });
-  }
-);
-
-router.get(
-  "/login/email-link/verify",
-  passport.authenticate("magiclink", {
-    action: "acceptToken",
-    successReturnToOrRedirect: process.env.FRONTEND_URL,
-    failureRedirect: "/auth/login/failed",
-    failureMessage: true,
-  })
-);
-
-router.post(
-  "/forgot/password/email",
-  passport.authenticate("magiclink", {
-    action: "requestToken",
-    failureRedirect: "/auth/forgotpassword/failed",
-    failureMessage: true,
-  }),
-  (req, res, next) => {
-    res.status(200).json({ status: "success" });
-  }
-);
-
-router.get("/forgot/password/email/verify/:username", (req, res, next) => {
-  passport.authenticate("magiclink", {
-    action: "acceptToken",
-    successReturnToOrRedirect: `${process.env.FRONTEND_URL}/settings?forgotPassword=true`,
-    failureRedirect: "/auth/forgotpassword/failed",
-    failureMessage: true,
-  })(req, res, next);
-});
-
-router.get("/google/login", passport.authenticate("google-login"));
-router.get("/google/redirect/login", (req, res, next) => {
-  passport.authenticate("google-login", {
-    successRedirect: `${process.env.FRONTEND_URL}/dasboard`,
-    failureRedirect: `${process.env.FRONTEND_URL}/login?social_login_failed=true`,
-    failureMessage: true,
-  })(req, res, next);
-});
 
 router.post("/logout", (req, res, next) => {
   req.logout((err) => {
