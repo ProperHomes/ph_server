@@ -23,7 +23,7 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 const whitelistedOrigins = [
   // "http://localhost:3000",
-  // "https://sandbox.properhomes.in",
+  "https://staging.properhomes.in",
   "https://properhomes.in",
 ];
 
@@ -57,7 +57,7 @@ const sessionMiddleware = session({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true, // default
     sameSite: "lax", // Cannot be 'strict' otherwise OAuth won't work.
     secure: IS_PROD || IS_DEV,
