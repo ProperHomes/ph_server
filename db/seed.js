@@ -38,13 +38,13 @@ const ALL_CITIES = [
 ];
 
 const AREA_UNITS = [
-  "cents",
-  "sq.ft",
-  "sq.mt",
-  "sq.yards",
-  "acres",
-  "hectares",
-  "guntha",
+  "CENT",
+  "SQ_FT",
+  "SQ_MT",
+  "SQ_YARD",
+  "ACRE",
+  "HECTARE",
+  "GUNTHA",
 ];
 
 const propertyConditions = ["OK", "GOOD", "VERY_GOOD", "AVERAGE"];
@@ -76,11 +76,11 @@ async function insertProperties({ numberOfRecords, ownerId }) {
       title, type, description, country, city, 
       price, area, area_unit, bedrooms, bathrooms, 
       age, has_parking, has_basement, has_swimming_pool,
-      is_furnished, owner_id, listed_for, condition, status, slug
+      is_furnished, owner_id, listed_for, condition, listing_status, slug, pincode
     ) values (
       $1, $2, $3, $4, $5, $6, 
       $7, $8, $9, $10, $11, $12, 
-      $13, $14, $15, $16, $17, $18, $19, $20
+      $13, $14, $15, $16, $17, $18, $19, $20, $21
     ) returning *`;
 
     for (let i = 0; i < numberOfRecords; i++) {
@@ -97,19 +97,19 @@ async function insertProperties({ numberOfRecords, ownerId }) {
         propertyType === "COMMERCIAL" ||
         propertyType === "PROJECT"
       ) {
-        areaUnit = "acres";
+        areaUnit = "ACRE";
       }
       if (propertyType === "ROOM") {
-        areaUnit = "sq.ft";
+        areaUnit = "SQ_FT";
       }
       let area = faker.number.int({ max: 100 });
-      if (areaUnit === "sq.ft" || areaUnit === "sq.mt") {
+      if (areaUnit === "SQ_FT" || areaUnit === "SQ_MT") {
         area = faker.number.int({ max: 5000 });
       }
-      if (areaUnit === "cents") {
+      if (areaUnit === "CENT") {
         area = faker.number.int({ max: 100 });
       }
-      if (areaUnit === "acres") {
+      if (areaUnit === "ACRE") {
         area = faker.number.int({ max: 10 });
       }
       const slug = `${propertyType.toLowerCase()}-for-${listingType.toLowerCase()}-in-${city.toLowerCase()}-${i}`;
@@ -134,6 +134,7 @@ async function insertProperties({ numberOfRecords, ownerId }) {
         condition,
         "APPROVED",
         slug,
+        523335,
       ]);
       const newProperty = res.rows[0];
       await insertPropertyMedia({

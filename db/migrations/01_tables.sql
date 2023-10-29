@@ -112,13 +112,13 @@ create type ph_public.subscription_type as enum (
 );
 
 create type ph_public.area_type as enum (
-    'cents',
-    'sq.ft',
-    'sq.mt',
-    'sq.yards',
-    'acres',
-    'hectares',
-    'guntha'
+    'CENT',
+    'SQ_FT',
+    'SQ_MT',
+    'SQ_YARD',
+    'ACRE',
+    'HECTARE',
+    'GUNTHA'
 );
 
 comment on type ph_public.property_city is E'@enum\n@enumName PropertyCity';
@@ -226,7 +226,7 @@ create table if not exists ph_public.property (
     guest_id uuid references ph_public.user(id),
     org_id uuid references ph_public.organization(id),
     view_count bigint default 0, -- If property is listed within 24 hours and has more than a set number of views then add a popular/rising
-    status ph_public.property_status not null,
+    status ph_public.property_status,
     listing_status ph_public.listing_status not null default 'DRAFT',
     listed_for ph_public.listing_type not null,
     condition ph_public.property_condition not null default 'GOOD',
@@ -429,7 +429,12 @@ drop table if exists ph_public.file;
 
 drop type if exists ph_public.area_type;
 drop type if exists ph_public.subscription_type;
+drop type if exists ph_public.payment_for;
+drop type if exists ph_public.payment_mode;
+drop type if exists ph_public.property_schedule_type;
+drop type if exists ph_public.property_city;
 drop type if exists ph_public.property_status;
+drop type if exists ph_public.listing_status;
 drop type if exists ph_public.listing_type;
 drop type if exists ph_public.property_facing;
 drop type if exists ph_public.property_condition;
