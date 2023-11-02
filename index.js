@@ -24,7 +24,8 @@ const IS_DEV = process.env.NODE_ENV === "development";
 const whitelistedOrigins = [
   // "http://localhost:3000",
   "https://staging.properhomes.in",
-  "https://properhomes.in",
+  "https://www.properhomes.in",
+  "https://properhomes.in"
 ];
 
 const app = express();
