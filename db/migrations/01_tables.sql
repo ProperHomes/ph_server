@@ -62,7 +62,8 @@ create type ph_public.property_status as enum (
     'LEASED',
     'NOT_FOR_SALE',
     'NOT_FOR_RENT',
-    'UNDER_CONSTRUCTION'
+    'UNDER_CONSTRUCTION',
+    "READY_TO_MOVE"
 );
 
 create type ph_public.property_city as enum (
@@ -218,6 +219,7 @@ create table if not exists ph_public.property (
     has_basement boolean,
     has_swimming_pool boolean,
     is_furnished boolean, 
+    is_semi_furnished boolean,
     facing ph_public.property_facing,
     attributes jsonb default '{}'::jsonb,
     rera_id text,
