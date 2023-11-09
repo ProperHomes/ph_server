@@ -149,6 +149,7 @@ drop index if exists pending_payment_property_idx;
 drop index if exists pending_payment_owner_idx;
 drop index if exists pending_payment_user_idx;
 
+alter table ph_public.property_payment drop constraint property_payment_user_unique_constraint; 
 drop index if exists property_payment_created_idx;
 drop index if exists property_payment_payment_for_idx;
 drop index if exists property_payment_payment_mode_idx;
