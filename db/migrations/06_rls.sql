@@ -25,11 +25,14 @@ create policy insert_user ON ph_public.user for insert TO ph_dev with check (tru
 
 create policy select_org ON ph_public.organization for select TO ph_user using (true);
 create policy update_org ON ph_public.organization for update TO ph_user using (
-    id = current_setting('jwt.claims.user_org_id', true)::uuid and
     (
-      current_setting('jwt.claims.org_user_type', true) = 'ADMIN' or
-      current_setting('jwt.claims.org_user_type', true) = 'MANAGER'
-    ) 
+      id = current_setting('jwt.claims.user_org_id', true)::uuid and
+      (
+        current_setting('jwt.claims.org_user_type', true) = 'ADMIN' or
+        current_setting('jwt.claims.org_user_type', true) = 'MANAGER'
+      )
+    ) or
+    exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
 );
 create policy insert_org ON ph_public.organization for insert TO ph_dev with check (true); -- admin only
 
@@ -37,11 +40,13 @@ create policy insert_org ON ph_public.organization for insert TO ph_dev with che
 create policy select_property ON ph_public.property for select TO ph_anon using (true);
 create policy update_property ON ph_public.property for update TO ph_user using (
   owner_id = current_setting('jwt.claims.user_id', true)::uuid or
-  org_id = current_setting('jwt.claims.user_org_id', true)::uuid
+  org_id = current_setting('jwt.claims.user_org_id', true)::uuid or
+  exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
 );
 create policy insert_property ON ph_public.property for insert TO ph_user with check (
   owner_id = current_setting('jwt.claims.user_id', true)::uuid or
-  org_id = current_setting('jwt.claims.user_org_id', true)::uuid
+  org_id = current_setting('jwt.claims.user_org_id', true)::uuid or
+  exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
 );
 create policy delete_property ON ph_public.property for delete TO ph_dev using (true); -- admin only
 
@@ -49,14 +54,13 @@ create policy delete_property ON ph_public.property for delete TO ph_dev using (
 
 create policy select_property_media ON ph_public.property_media for select TO ph_anon using (true);
 create policy insert_property_media ON ph_public.property_media for insert TO ph_user with check (
-  exists ( 
-    select 1 from ph_public.property as p where ( p.id = ph_public.property_media.property_id ) and 
-    (
-      p.owner_id = current_setting('jwt.claims.user_id', true)::uuid
-    ) 
-  ) 
+  exists (select 1 from ph_public.property as p where ( p.id = ph_public.property_media.property_id ) and ( p.owner_id = current_setting('jwt.claims.user_id', true)::uuid) ) or
+  exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
 );
-create policy delete_property_media ON ph_public.property_media for delete TO ph_user using (true); -- admin only
+create policy delete_property_media ON ph_public.property_media for delete TO ph_user using (
+  exists (select 1 from ph_public.property as p where ( p.id = ph_public.property_media.property_id ) and ( p.owner_id = current_setting('jwt.claims.user_id', true)::uuid) ) or
+  exists (select 1 from ph_public.user as u where u.id = current_setting('jwt.claims.user_id', true)::uuid and u.is_sys_admin = true)
+);
 
 
 create policy select_saved_property ON ph_public.saved_property for select TO ph_user using (true);

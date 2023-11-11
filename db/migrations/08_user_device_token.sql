@@ -35,4 +35,4 @@ drop policy if exists select_user_device_token on ph_public.user_device_token;
 revoke ALL on ph_public.user_device_token from ph_user;
 drop index if exists user_device_token_idx;
 alter table ph_public.user_device_token drop constraint user_device_token_unique_constraint; 
-drop table if exists ph_public.user_push_notification;
+drop table if exists ph_public.user_device_token;

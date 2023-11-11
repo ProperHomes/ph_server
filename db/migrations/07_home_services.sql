@@ -5,6 +5,7 @@ ALTER TYPE ph_public.user_type ADD VALUE 'HOME_SERVICE_PROFESSIONAL';
 create type ph_public.home_service_status as enum (
     'DRAFT',
     'REJECTED',
+    'IN_REVIEW', -- Todo: add this
     'APPROVED'
 );
 
@@ -13,9 +14,9 @@ create type ph_public.home_service_category as enum (
     'KITCHEN_CLEANING',
     'HOME_CLEANING',
     'AC_REPAIR',
-    'CAR_WASH',
-    'WOMEN_SALON',
-    'MEN_SALON'
+    'CAR_WASH', -- Todo: Remove this
+    'WOMEN_SALON', -- Todo: REMOVE this
+    'MEN_SALON' -- Todo: REMOVE this
 );
 
 create table if not exists ph_public.home_service (

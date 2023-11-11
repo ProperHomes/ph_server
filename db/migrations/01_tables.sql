@@ -2,7 +2,7 @@
 
 create type ph_public.user_type as enum (
     'SELLER',
-    'AGENT',
+    'AGENT', -- Todo: remove this
     'BUYER',
     'TENANT',
     'ADMIN'
@@ -63,7 +63,7 @@ create type ph_public.property_status as enum (
     'NOT_FOR_SALE',
     'NOT_FOR_RENT',
     'UNDER_CONSTRUCTION',
-    "READY_TO_MOVE"
+    'READY_TO_MOVE'
 );
 
 create type ph_public.property_city as enum (
