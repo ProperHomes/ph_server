@@ -22,7 +22,7 @@ create type ph_public.property_type as enum (
     'PG',
     'BUNGALOW',
     'FARM_HOUSE',
-    'PROJECT',
+    'PROJECT', -- Todo: remove this from db
     'COMMERCIAL',
     'HOSTEL',
     'ROOM'

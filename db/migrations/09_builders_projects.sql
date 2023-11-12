@@ -14,6 +14,8 @@ create table if not exists ph_public.builder (
     logo_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
     experience int,
+    office_address text,
+    operating_cities text[],
     phone_number text, 
     attributes jsonb default '{}' :: jsonb,
     created_at timestamptz not null default now(),
@@ -31,10 +33,13 @@ create table if not exists ph_public.project (
     cover_image_id uuid references ph_public.file(id),
     brochure_id uuid references ph_public.file(id),
     address text,
+    pincode text,
     status ph_public.project_status not null,
-    price_range text,
+    price_range int[],
     amenities jsonb default '{}' :: jsonb,
     attributes jsonb default '{}' :: jsonb,
+    launch_date timestamptz,
+    completed_at timestamptz,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

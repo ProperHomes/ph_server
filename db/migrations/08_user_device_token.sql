@@ -17,13 +17,13 @@ grant select, insert, update, delete on ph_public.user_device_token to ph_user;
 alter table ph_public.user_device_token enable row level security;
 
 create policy select_user_device_token ON ph_public.user_device_token for select TO ph_user using (
-  user_id = current_setting('jwt.claims.user_org_id', true)::uuid
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 create policy insert_user_device_token ON ph_public.user_device_token for insert TO ph_user with check (
-  user_id = current_setting('jwt.claims.user_org_id', true)::uuid
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 create policy delete_user_device_token ON ph_public.user_device_token for update TO ph_user using (
-  user_id = current_setting('jwt.claims.user_org_id', true)::uuid
+  user_id = current_setting('jwt.claims.user_id', true)::uuid
 );
 
 -- rambler down
