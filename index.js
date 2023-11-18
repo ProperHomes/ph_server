@@ -13,6 +13,7 @@ import {
   changePassword,
   forgotPasswordChange,
   revalidateNextJSApp,
+  updateUser,
 } from "./libs/auth";
 
 const morgan = require("morgan");
@@ -116,8 +117,24 @@ app.use("/auth", authRoutes);
 app.post("/change/password", authCheck, (req, res) => {
   if (req.user.id === req.body.userId) {
     changePassword(req, res);
+  } else {
+    return res.status(401).json({
+      authenticated: false,
+      message: "unautorhized",
+    });
   }
 });
+app.post("/update/user", authCheck, (req, res) => {
+  if (req.user.id === req.body.userId) {
+    updateUser(req, res);
+  } else {
+    return res.status(401).json({
+      authenticated: false,
+      message: "unautorhized",
+    });
+  }
+});
+
 app.post("/change/forgot/password", authCheck, (req, res) => {
   if (req.user.id === req.body.userId) {
     forgotPasswordChange(req, res);

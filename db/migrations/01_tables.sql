@@ -147,7 +147,7 @@ create table if not exists ph_public.file (
 
 create table if not exists ph_public.user (
     id uuid primary key default gen_random_uuid(),
-    name text not null,
+    name text,
     number serial unique,
     phone_number text unique,
     username text unique,
@@ -156,7 +156,7 @@ create table if not exists ph_public.user (
     type ph_public.user_type not null,
     org_user_type ph_public.org_level_type,
     country text not null,
-    city text not null,
+    city text,
     avatar_id uuid references ph_public.file(id),
     cover_image_id uuid references ph_public.file(id),
     is_sys_admin boolean default false,

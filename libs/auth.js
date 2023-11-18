@@ -109,6 +109,20 @@ async function forgotPasswordChange(req, res) {
   }
 }
 
+async function updateUser(req, res) {
+  const { password, name, city, userId } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await pgPool.query(
+      `update ph_public.user set password_hash=$1, name=$2, city=$3 where id=$4`,
+      [hashedPassword, name, city, userId]
+    );
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ message: `Error updating user: ${err}` });
+  }
+}
+
 async function getUserByEmail(email) {
   try {
     const res = await pgPool.query(
@@ -161,19 +175,27 @@ async function verifyPhoneNumberOtpAndLogin(req, res) {
       .status(500)
       .json({ message: `both Phone number and otp are required: ${err}` });
   }
+  const phoneNo = phoneNumber[0] === "+" ? phoneNumber.slice(1) : phoneNumber;
+  let isSignup = false;
   try {
     const isValid = await checkSmsVerificationToken(phoneNumber, otp);
     if (isValid) {
-      const phoneNo =
-        phoneNumber[0] === "+" ? phoneNumber.slice(1) : phoneNumber;
-      const user = await getUserByPhoneNumber(phoneNo);
+      let user = await getUserByPhoneNumber(phoneNo);
+      if (!user) {
+        const newRes = await pgPool.query(
+          `insert into ph_public.user (phone_number, type, country) values ($1, $2, $3) returning *`,
+          [phoneNo, "BUYER", "INDIA"]
+        );
+        user = newRes.rows[0];
+        isSignup = true;
+      }
       return await req.logIn(user, (err) => {
         if (err) {
           return res.status(500).json({
             error: "error after verifyling otp and trying to login user",
           });
         } else {
-          return res.status(200).json({ userId: user.id });
+          return res.status(200).json({ userId: user.id, isSignup });
         }
       });
     } else {
@@ -244,6 +266,7 @@ async function revalidateNextJSApp(req, res) {
 export {
   login,
   signup,
+  updateUser,
   changePassword,
   forgotPasswordChange,
   getUserByEmail,
