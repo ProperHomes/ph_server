@@ -15,6 +15,7 @@ import {
   revalidateNextJSApp,
   updateUser,
 } from "./libs/auth";
+import { generateRentalAgreement } from "./libs/generateRentalAgreement";
 
 const morgan = require("morgan");
 
@@ -133,6 +134,10 @@ app.post("/update/user", authCheck, (req, res) => {
       message: "unautorhized",
     });
   }
+});
+
+app.post("/create-rental-agreement", authCheck, (req, res) => {
+  generateRentalAgreement(req, res);
 });
 
 app.post("/change/forgot/password", authCheck, (req, res) => {
